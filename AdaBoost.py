@@ -84,11 +84,16 @@ pred_test = base_tree.predict(X_test)
 error_train= sum(pred_train != Y_train) / float(Y_train.shape[0])
 error_test = sum(pred_test != Y_test) / float(Y_test.shape[0])
 
-training_pred = pred_train
-testing_pred = pred_test
-train_err_M = error_train
-test_err_M =error_test
+training_pred = []
+testing_pred = []
+train_err_M = []
+test_err_M = []
 
+training_pred.append(pred_train)
+testing_pred.append(pred_test)
+train_err_M.append(error_train)
+test_err_M.append(error_test)
+    
 
 M = 100     #Number of iterations for adaboost     
 for i in range(1, M, 10):    
@@ -101,7 +106,7 @@ for i in range(1, M, 10):
     test_err_M.append(error_test)
     
 
-iRange=np.arange(1, M, 10)
+iRange=np.arange(1, M+10, 10)
 trainERR,= plt.plot(iRange,train_err_M,'g')
 testERR,= plt.plot(iRange,test_err_M,'r')
 
@@ -109,5 +114,3 @@ plt.xlabel('iterations')
 plt.ylabel('Errors')
 plt.legend([trainERR,testERR], ["Training error","testing error"])
 plt.show()     
-
-
