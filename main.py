@@ -58,8 +58,6 @@ def loadData(addresses):
     # TODO: data loading
     
 def dataset_split(X,Y,valid_split_rate,test_split_rate):
-    
-    
     test_split = int(test_split_rate*X.shape[0])
     validate_split = int((valid_split_rate*test_split*X.shape[0])
     X_tr = X[:test_split]
