@@ -4,6 +4,11 @@ import sys
 from itertools import islice
 import random
 
+# Caluculated pixel-related features with sliding window
+# ---sum of pixel values
+# ---range of pixel values
+# ---variance of pixel values
+# ---median of pixel values
 def pixelFeature(input_image, w):
     # windows should be an array of window sizes: 3, 5, 9, 15, 19, 25
     if not input_image.size:
@@ -55,6 +60,7 @@ def adjacentHLFeatures(input_image, window1, window2):
         features[y2, x2, 0:input_image.shape[2]] = sum(sum(window2)) - sum(sum(window1))
     return features
 
+# Caluculated nonadjacent Haar-Like Features
 def nonadjacentHLFeatures1(input_image, window1, window2, window3, norm):
     # 5 <= W1 <= 25
     # 1 <= W2,W3,W4 <= 8
@@ -78,6 +84,8 @@ def nonadjacentHLFeatures1(input_image, window1, window2, window3, norm):
         features[y123, x123, 0:input_image.shape[2]] = sum(sum(window123))
         - sum(sum(window12)) - norm * sum(sum(window1))
     return features
+
+# Caluculated nonadjacent Haar-Like Features 2
 
 def nonadjacentHLFeatures2(input_image, window1, window2, window3, window4, norm):
     # 5 <= W1 <= 25
@@ -109,10 +117,10 @@ def nonadjacentHLFeatures2(input_image, window1, window2, window3, window4, norm
 
 
 
-def main():
-    im = Image.open('/Users/wuwenjun/Downloads/sample.jpg')
-    imdata = np.array(im.getdata(), dtype=np.float64).reshape(im.size[1], im.size[0], 3)
-    print imdata.shape
+# def main():
+#     im = Image.open('/Users/wuwenjun/Downloads/sample.jpg')
+#     imdata = np.array(im.getdata(), dtype=np.float64).reshape(im.size[1], im.size[0], 3)
+#     print imdata.shape
     #pFeature = pixelFeature(imdata, 3)
     #adjacentF = adjacentHLFeatures(imdata, 3, 1)
     #print pFeature.shape
@@ -127,4 +135,4 @@ def main():
     #         outfile.write('# New slice\n')
 
             
-main()
+# main()
