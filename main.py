@@ -111,9 +111,18 @@ def doPCA(data, threshold):
 
 X = Image.open("/Users/shimanofallah/dropbox/MP_0270 crop 1.tif")
 Y = Image.open("/Users/shimanofallah/dropbox/MP_0270 crop 1_mask.tif")
+# compute the features and change dimensions
+features = computeFeature(X, [3, 15, 8, 4, 2])
+resized_features = np.resize(features, 
+                             (features.shape[0]*features.shape[1], features.shape[2]))
+resized_labels = np.resize(Y, (Y.shape[0]*Y.shape[1],1))
+
 
 # Split into training and test set
-[X_train, Y_train , X_validate, Y_validate ,X_test , Y_test] = dataset_split(X,Y,0.9,0.8)              
+[X_train, Y_train , X_validate, Y_validate ,X_test , Y_test] = dataset_split(resized_features,
+resized_labels,0.9,0.8)        
+# reduce feature dimension
+[pca_train, Y_train, pca_validate, Y_validate, pca_test, Y_test] = reduceFeatures(X_train, Y_train , X_validate, Y_validate ,X_test , Y_test)      
 
 # Fit a simple decision tree first
 base_tree = DecisionTreeClassifier(max_depth = 1, random_state = 1)
