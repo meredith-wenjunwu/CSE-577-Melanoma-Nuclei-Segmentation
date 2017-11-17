@@ -71,17 +71,19 @@ def dataset_split(X,Y,valid_split_rate,test_split_rate):
     X_test = X[test_split:]
     Y_test = Y[test_split:]
     
-    return X_train, Y_train , X_validate, Y_validate ,X_test , Y_test
+     return X_train, Y_train , X_validate, Y_validate ,X_test , Y_test
     
     # Compute Features, I assume:
     # X_train is training data, Y_train is training label
     # X_validate is validation data, Y_validate is validation label
     # X_test is test data, Y_test is test label
     # the window sizes are just examples here. 
-    feature_train = computeFeature(X_train, [3, 15, 8, 4, 2])
-    feature_validate = computeFeature(X_validate, [3, 15, 8, 4, 2])
-    feature_test = computeFeature(X_test, [3, 15, 8, 4, 2])
+#    feature_train = computeFeature(X_train, [3, 15, 8, 4, 2])
+#    feature_validate = computeFeature(X_validate, [3, 15, 8, 4, 2])
+#    feature_test = computeFeature(X_test, [3, 15, 8, 4, 2])
     # The following are PCA Feature Reduction, threshold are set to be 0.99 for now
+def reduceFeatures(feature_train, Y_train, feature_validate, Y_validate, 
+                   feature_test, Y_test):
     (pca, numComponents) = doPCA(feature_train, 0.99)
     pca_train = pca.transform(feature_train)
     pca_validate = pca.transform(feature_validate)
