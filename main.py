@@ -86,9 +86,7 @@ def dataset_split(X,Y,valid_split_rate,test_split_rate):
     pca_train = pca.transform(feature_train)
     pca_validate = pca.transform(feature_validate)
     pca_test = pca.transform(feature_test)
-    return {'data_train': pca_train, 'label_train': Y_train, 
-            'data_validate': pca_validate, 'label_validate': Y_validate,
-            'data_test': pca_test, 'label_test': Y_test}
+    return pca_train, Y_train, pca_validate, Y_validate, pca_test, Y_test
 
 
 
