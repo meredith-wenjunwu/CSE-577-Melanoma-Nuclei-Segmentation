@@ -20,7 +20,7 @@ from sklearn.decoposition import PCA
 #           1 <= W2,W3,W4 <= 8
 # - norm (optional) - normalization factor for nonadjacent Haar-like features (default is 1)
 # Return: numpy.array of concatenated features; empty numpy array if wrong size is passed in
-=============================================================================
+# =============================================================================
 def computeFeature(input, windowSizeArray, norm = 1):
     if (len(windowSizeArray == 1)):
         return feature.pixelFeature(input, windowSizeArray[0])
