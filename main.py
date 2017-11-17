@@ -7,14 +7,20 @@ from sklearn.decoposition import PCA
 
 
 # =============================================================================
-#  Calculate Features, concatenate them, return.
-#  windowSizeArray should have length of 5
-#      - [0]: pixel feature
+# Calculate Features, concatenate them, return.
+# - windowSizeArray could have length 1, 3, 4 or 5
+#      - length 1: pixel feature
+#      - length 3: pixel feature and adjacent Haar-like features
+#      - length 4: pixel feature, adjacent Haar-like features and nonadjacent Haar like feature 1
+#      - length 5: pixel feature, adjacent Haar-like features, nonadjacent Haar like feature 1
+#                  and nonadjacent Haar like feature 2
+#           
 #      - [1:4]: Haar-like feature w1, w2, w3, w4
-#      # 5 <= W1 <= 25
-#      1 <= W2,W3,W4 <= 8
-#  norm (optional) - normalization factor for nonadjacent Haar-like features (default is 1)
-# =============================================================================
+#           5 <= W1 <= 25
+#           1 <= W2,W3,W4 <= 8
+# - norm (optional) - normalization factor for nonadjacent Haar-like features (default is 1)
+# Return: numpy.array of concatenated features; empty numpy array if wrong size is passed in
+=============================================================================
 def computeFeature(input, windowSizeArray, norm = 1):
     if (len(windowSizeArray == 1)):
         return feature.pixelFeature(input, windowSizeArray[0])
