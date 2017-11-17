@@ -1,8 +1,10 @@
-from PIL import Image
+#### Functions
+
+#from PIL import Image
 import numpy as np
-import sys
-from itertools import islice
-import random
+#import sys
+#from itertools import islice
+#import random
 
 # Caluculated pixel-related features with sliding window
 # ---sum of pixel values
@@ -37,6 +39,7 @@ def pixelFeature(input_image, w):
             features[y, x, i + 3 * layer] = np.median(window[:, :, i])
     return features
 
+
 def sliding_window(image, windowSize):
     # slide a window across the image
     if not image.size:
@@ -45,6 +48,7 @@ def sliding_window(image, windowSize):
     for y in xrange(0, image.shape[0], 1):
         for x in xrange(0, image.shape[1], 1):
             yield (x, y, image[y:y + windowSize[1], x:x + windowSize[0]])
+
 
 def adjacentHLFeatures(input_image, window1, window2):
     # 5 <= W1 <= 25
@@ -60,8 +64,9 @@ def adjacentHLFeatures(input_image, window1, window2):
         features[y2, x2, 0:input_image.shape[2]] = sum(sum(window2)) - sum(sum(window1))
     return features
 
+
 # Caluculated nonadjacent Haar-Like Features
-def nonadjacentHLFeatures1(input_image, window1, window2, window3, norm):
+def nonadjacentHLFeatures1(input_image, window1, window2, window3, norm = 1):
     # 5 <= W1 <= 25
     # 1 <= W2,W3,W4 <= 8
     # norm is normalization factor, default = 1
@@ -85,9 +90,9 @@ def nonadjacentHLFeatures1(input_image, window1, window2, window3, norm):
         - sum(sum(window12)) - norm * sum(sum(window1))
     return features
 
-# Caluculated nonadjacent Haar-Like Features 2
 
-def nonadjacentHLFeatures2(input_image, window1, window2, window3, window4, norm):
+# Caluculated nonadjacent Haar-Like Features 2
+def nonadjacentHLFeatures2(input_image, window1, window2, window3, window4, norm = 1):
     # 5 <= W1 <= 25
     # 1 <= W2,W3,W4 <= 8
     # norm is normalization factor, default = 1
