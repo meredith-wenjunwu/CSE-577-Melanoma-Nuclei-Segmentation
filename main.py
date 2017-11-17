@@ -55,7 +55,7 @@ def computeFeature(input, windowSizeArray, norm = 1):
 #           later to used in Adaboost training
 # =============================================================================
 def loadData(addresses):
-    # data loading not implemented
+    # TODO: data loading
     
 def dataset_split(X,Y,valid_split_rate,test_split_rate):
     
@@ -81,7 +81,7 @@ def dataset_split(X,Y,valid_split_rate,test_split_rate):
     feature_train = computeFeature(X_train, [3, 15, 8, 4, 2])
     feature_validate = computeFeature(X_validate, [3, 15, 8, 4, 2])
     feature_test = computeFeature(X_test, [3, 15, 8, 4, 2])
-    # The following are PCA Feature Reduction, threshold are set to be 0.99 now
+    # The following are PCA Feature Reduction, threshold are set to be 0.99 for now
     (pca, numComponents) = doPCA(feature_train, 0.99)
     pca_train = pca.transform(feature_train)
     pca_validate = pca.transform(feature_validate)
@@ -93,17 +93,18 @@ def dataset_split(X,Y,valid_split_rate,test_split_rate):
 
 
 # =============================================================================
-# Increase number of components until reaching the threshold of explained
-# variance ratio
+# Perform PCA dimensionality reduction:
+#   Increase number of components until reaching the threshold of explained
+#   variance ratio
 # =============================================================================
-
 def doPCA(data, threshold):
     fTotal = data.shape[2]
     for i in xrange(1,fTotal):
         pca = PCA(n_components = i)
         pca.fit(data)
-        if (pca.explained_variance_ratio_ > treshold):
+        if (pca.explained_variance_ratio_ > threshold):
             return (pca, i)
+    return (pca, fTotal)
 
 
 # Split into training and test set
