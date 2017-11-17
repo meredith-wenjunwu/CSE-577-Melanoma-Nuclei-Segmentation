@@ -54,8 +54,6 @@ def computeFeature(input, windowSizeArray, norm = 1):
 # Return: a dictionary that has the dimensionality reduced dataset - this could
 #           later to used in Adaboost training
 # =============================================================================
-def loadData(addresses):
-    # TODO: data loading
     
 def dataset_split(X,Y,valid_split_rate,test_split_rate):
     
