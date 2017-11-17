@@ -1,3 +1,4 @@
+
 #### Main
 import Adaboost
 import feature
@@ -50,6 +51,21 @@ def computeFeature(input, windowSizeArray, norm = 1):
 def loadData(addresses):
     # data loading not implemented
     
+def dataset_split(X,Y,valid_split_rate,test_split_rate):
+    
+    
+    test_split = int(test_split_rate*X.shape[0])
+    validate_split = int((valid_split_rate*test_split*X.shape[0])
+    X_tr = X[:test_split]
+    Y_tr = Y[:test_split]
+    X_train = X_tr[:validate_split]
+    Y_train = Y_tr[:validate_split]
+    X_validate = X_tr[validate_split:]
+    Y_validate = Y_tr[validate_split:]
+    X_test = X[test_split:]
+    Y_test = Y[test_split:]
+    
+    return X_train, Y_train , X_validate, Y_validate ,X_test , Y_test
     
     # Compute Features, I assume:
     # X_train is training data, Y_train is training label
@@ -85,7 +101,7 @@ def doPCA(data, threshold):
 
 
 # Split into training and test set
-[X_train, Y_train , X_test , Y_test] = dataset_split(X,Y,0.8)              
+[X_train, Y_train , X_validate, Y_validate ,X_test , Y_test] = dataset_split(X,Y,0.9,0.8)              
 
 # Fit a simple decision tree first
 base_tree = DecisionTreeClassifier(max_depth = 1, random_state = 1)
@@ -128,4 +144,4 @@ testERR,= plt.plot(iRange,test_err_M,'r')
 plt.xlabel('iterations')
 plt.ylabel('Errors')
 plt.legend([trainERR,testERR], ["Training error","testing error"])
-plt.show()     
+plt.show() 
