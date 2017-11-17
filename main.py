@@ -5,6 +5,8 @@ import feature
 import numpy as np
 from sklearn.decoposition import PCA
 from PIL import Image
+import matplotlib.pyplot as plt
+from sklearn.tree import DecisionTreeClassifier
 
 # =============================================================================
 # Calculate Features, concatenate them, return.
@@ -56,18 +58,23 @@ def computeFeature(input, windowSizeArray, norm = 1):
 # =============================================================================
     
 def dataset_split(X,Y,valid_split_rate,test_split_rate):
+    rows = X.shape[0]
+    np.random.shuffle(rows)
+    X_shuffle = X[rows]
+    Y_shuffle = Y[rows]
+    
     test_split = int(test_split_rate*X.shape[0])
-    validate_split = int((valid_split_rate*test_split*X.shape[0])
-    X_tr = X[:test_split]
-    Y_tr = Y[:test_split]
+    validate_split = int((valid_split_rate*test_split*X.shape[0]))
+    X_tr = X_shuffle[:test_split]
+    Y_tr = Y_shuffle[:test_split]
     X_train = X_tr[:validate_split]
     Y_train = Y_tr[:validate_split]
     X_validate = X_tr[validate_split:]
     Y_validate = Y_tr[validate_split:]
-    X_test = X[test_split:]
-    Y_test = Y[test_split:]
+    X_test = X_shuffle[test_split:]
+    Y_test = Y_shuffle[test_split:]
     
-     return X_train, Y_train , X_validate, Y_validate ,X_test , Y_test
+    return X_train, Y_train , X_validate, Y_validate ,X_test , Y_test
     
     # Compute Features, I assume:
     # X_train is training data, Y_train is training label
@@ -130,9 +137,10 @@ testing_pred.append(pred_test)
 train_err_M.append(error_train)
 test_err_M.append(error_test)
     
-
-M = 100     #Number of iterations for adaboost     
-for i in range(1, M, 10):    
+##(Shima) should put a stopping point
+##(Shima) should change testings with validation and add testing oart at the end
+Ada_iter = 100     #Number of iterations for adaboost     
+for i in range(1, Ada_iter, 10):    
     [pred_train , pred_test , error_train , 
      error_test ] = Adaboost(X_train , Y_train , X_test, Y_test, i, base_tree)
 
@@ -142,7 +150,7 @@ for i in range(1, M, 10):
     test_err_M.append(error_test)
     
 
-iRange=np.arange(1, M+10, 10)
+iRange=np.arange(1, Ada_iter+10, 10)
 trainERR,= plt.plot(iRange,train_err_M,'g')
 testERR,= plt.plot(iRange,test_err_M,'r')
 

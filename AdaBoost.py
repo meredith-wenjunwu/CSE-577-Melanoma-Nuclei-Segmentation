@@ -7,8 +7,6 @@ Created on Mon Nov 6 18:26:58 2017
 """
 
 import numpy as np
-from sklearn.tree import DecisionTreeClassifier
-import matplotlib.pyplot as plt
 
 #### Functions
 
