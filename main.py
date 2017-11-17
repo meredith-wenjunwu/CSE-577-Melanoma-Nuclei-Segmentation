@@ -4,7 +4,7 @@ import Adaboost
 import feature
 import numpy as np
 from sklearn.decoposition import PCA
-
+from PIL import Image
 
 # =============================================================================
 # Calculate Features, concatenate them, return.
@@ -102,6 +102,8 @@ def doPCA(data, threshold):
             return (pca, i)
     return (pca, fTotal)
 
+X = Image.open("/Users/shimanofallah/dropbox/MP_0270 crop 1.tif")
+Y = Image.open("/Users/shimanofallah/dropbox/MP_0270 crop 1_mask.tif")
 
 # Split into training and test set
 [X_train, Y_train , X_validate, Y_validate ,X_test , Y_test] = dataset_split(X,Y,0.9,0.8)              
