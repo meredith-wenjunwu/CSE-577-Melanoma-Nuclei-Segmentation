@@ -1,10 +1,14 @@
 #### Main
 
-#load the data (features)
-def loadFeature(input):
+#load the data (features) and perform PCA - Meredith
+def loadFeature(input, windowSizeArray):
     # not implemented
     return
 
+#load the data and split, call loadFeature(...) - Shima
+def loadData(image_address, mask_address):
+    # not implemented
+    return
 
 # Split into training and test set
 [X_train, Y_train , X_test , Y_test] = dataset_split(X,Y,0.8)              
