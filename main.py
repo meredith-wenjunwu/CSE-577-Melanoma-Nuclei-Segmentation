@@ -129,41 +129,47 @@ base_tree = DecisionTreeClassifier(max_depth = 1, random_state = 1)
 
 
 #errors and predictions before adaboost
-base_tree.fit(X_train,Y_train)
-pred_train = base_tree.predict(X_train)
-pred_test = base_tree.predict(X_test)
+base_tree.fit(pca_train,Y_train)
+pred_train = base_tree.predict(pca_train)
+pred_val = base_tree.predict(pca_train)
     
-error_train= sum(pred_train != Y_train) / float(Y_train.shape[0])
-error_test = sum(pred_test != Y_test) / float(Y_test.shape[0])
+error_train= sum(pred_train != pca_train) / float(Y_train.shape[0])
+error_val = sum(pred_val != pca_validate) / float(Y_validate.shape[0])
 
 training_pred = []
-testing_pred = []
+validation_pred = []
 train_err_M = []
-test_err_M = []
+val_err_M = []
 
 training_pred.append(pred_train)
-testing_pred.append(pred_test)
+validation_pred.append(pred_val)
 train_err_M.append(error_train)
-test_err_M.append(error_test)
+val_err_M.append(error_val)
     
 ##(Shima) should put a stopping point
 ##(Shima) should change testings with validation and add testing oart at the end
-Ada_iter = 100     #Number of iterations for adaboost     
-for i in range(1, Ada_iter, 10):    
-    [pred_train , pred_test , error_train , 
-     error_test ] = Adaboost(X_train , Y_train , X_test, Y_test, i, base_tree)
-
+stop = False
+epsilon = 0.01
+Ada_iter = 0     #Number of iterations for adaboost     
+while(stop == False):
+    Ada_iter = Ada_iter +1
+    past_error_val = error_val.copy()
+    [pred_train , pred_val , error_train , error_val ] = Adaboost(pca_train , Y_train , pca_validate, Y_validate, past_error_val, base_tree)
     training_pred.append(pred_train)
-    testing_pred.append(pred_test)
+    validation_pred.append(pred_val)
     train_err_M.append(error_train)
-    test_err_M.append(error_test)
+    val_err_M.append(error_val)
+    
+    check = np.amax(np.absolute(past_error_val-error_val))
+    if check < epsilon:
+        stop = True
     
 
 iRange=np.arange(1, Ada_iter+10, 10)
 trainERR,= plt.plot(iRange,train_err_M,'g')
-testERR,= plt.plot(iRange,test_err_M,'r')
+valERR,= plt.plot(iRange,val_err_M,'r')
 
 plt.xlabel('iterations')
 plt.ylabel('Errors')
-plt.legend([trainERR,testERR], ["Training error","testing error"])
+plt.legend([trainERR,valERR], ["Training error","Validation error"])
 plt.show() 
