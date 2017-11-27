@@ -22,6 +22,7 @@ def pixelFeature(input_image, w):
     (winW, winH) = (w, w)
     layer = input_image.shape[2]
     for (x, y, window) in sliding_window(input_image, (w, w)):
+        print(x,y)
         # if the window size does not meet our desired window size, ignore
         if window.shape[0] != winH or window.shape[1] != winW:
             continue
