@@ -1,4 +1,3 @@
-
 #### Main
 from AdaBoost import *
 import feature
@@ -49,7 +48,7 @@ def computeFeature(input, windowSizeArray, norm = 1):
         # Invalid Size, return empty array
         print("Not enough or too much window size provided. Returning empty np array")
         return np.array([]) 
-   
+
     
 # =============================================================================
 # Load the data and split, call loadFeature(...) - Shima
@@ -130,23 +129,28 @@ resized_labels = np.resize(Ydata, (Ydata.shape[0]*Ydata.shape[1],1))
 # Fit a simple decision tree first
 base_tree = DecisionTreeClassifier(max_depth = 1, random_state = 1)
 
-
-#errors and predictions before adaboost
 base_tree.fit(pca_train,Y_train)
 pred_train = base_tree.predict(pca_train)
-pred_val = base_tree.predict(pca_validate)
-    
+pred_val = base_tree.predict(pca_validate)   
 error_train = 1 - accuracy_score(Y_train, pred_train)
 error_val = 1 - accuracy_score(Y_validate, pred_val)
 
-stopEps = 0.01
-[pred_train , pred_val , error_train , error_val, iterations] = Adaboost(pca_train ,Y_train , pca_validate, Y_validate, error_val, base_tree,stopEps)
 
-#iRange=np.arange(1, iterations)
-#trainERR,= plt.plot(iRange,train_err_M,'g')
-#valERR,= plt.plot(iRange,val_err_M,'r')
-#
-#plt.xlabel('iterations')
-#plt.ylabel('Errors')
-#plt.legend([trainERR,valERR], ["Training error","Validation error"])
-#plt.show() 
+
+er_train = [error_train]
+er_val = [error_val]
+iteration=400
+
+for i in range(10, iteration+10, 10):
+    [error_train, error_val] = AdaBoost(pca_train ,Y_train , pca_validate, Y_validate, i, base_tree)
+    er_train.append(error_train)
+    er_val.append(error_val)
+
+
+D = range(0, iteration+10, 10)    
+TR,= plt.plot(D,er_train)
+TE,= plt.plot(D,er_val)
+plt.legend([TR,TE], ["Training data","Testing data"])
+plt.xlabel('iteration')
+plt.ylabel('Error')
+plt.show()
