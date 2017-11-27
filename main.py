@@ -1,9 +1,9 @@
 
 #### Main
-import Adaboost
+import AdaBoost
 import feature
 import numpy as np
-from sklearn.decoposition import PCA
+from sklearn.decomposition import PCA
 from PIL import Image
 import matplotlib.pyplot as plt
 from sklearn.tree import DecisionTreeClassifier
@@ -24,19 +24,19 @@ from sklearn.tree import DecisionTreeClassifier
 # Return: numpy.array of concatenated features; empty numpy array if wrong size is passed in
 # =============================================================================
 def computeFeature(input, windowSizeArray, norm = 1):
-    if (len(windowSizeArray == 1)):
+    if (len(windowSizeArray) == 1):
         return feature.pixelFeature(input, windowSizeArray[0])
-    elif (len(windowSizeArray == 3)): 
+    elif (len(windowSizeArray) == 3): 
         pixelF = feature.pixelFeature(input, windowSizeArray[0])
         adjacentHF = feature.adjacentHLFeatures(input, windowSizeArray[1], windowSizeArray[2])
         return np.concatenate((pixelF, adjacentHF), axis = 2)
-    elif (len(windowSizeArray == 4)):
+    elif (len(windowSizeArray) == 4):
         pixelF = feature.pixelFeature(input, windowSizeArray[0])
         adjacentHLF = feature.adjacentHLFeatures(input, windowSizeArray[1], windowSizeArray[2])
         nonadjacentHLF = feature.nonadjacentHLFeatures1(input, windowSizeArray[1], 
                                             windowSizeArray[2], windowSizeArray[3], norm)
         return np.concatenate((pixelF,adjacentHLF, nonadjacentHLF), axis = 2)
-    elif (len(windowSizeArray == 5)):
+    elif (len(windowSizeArray) == 5):
         pixelF = feature.pixelFeature(input, windowSizeArray[0])
         adjacentHLF = feature.adjacentHLFeatures(input, windowSizeArray[1], windowSizeArray[2])
         nonadjacentHLF = feature.nonadjacentHLFeatures1(input, windowSizeArray[1], 
@@ -59,12 +59,13 @@ def computeFeature(input, windowSizeArray, norm = 1):
     
 def dataset_split(X,Y,valid_split_rate,test_split_rate):
     rows = X.shape[0]
-    np.random.shuffle(rows)
-    X_shuffle = X[rows]
-    Y_shuffle = Y[rows]
+    arr = np.arange(rows)
+    np.random.shuffle(arr)
+    X_shuffle = X[arr]
+    Y_shuffle = Y[arr]
     
     test_split = int(test_split_rate*X.shape[0])
-    validate_split = int((valid_split_rate*test_split*X.shape[0]))
+    validate_split = int((valid_split_rate*test_split))
     X_tr = X_shuffle[:test_split]
     Y_tr = Y_shuffle[:test_split]
     X_train = X_tr[:validate_split]
@@ -109,13 +110,15 @@ def doPCA(data, threshold):
             return (pca, i)
     return (pca, fTotal)
 
-X = Image.open("/Users/shimanofallah/dropbox/MP_0270 crop 1.tif")
-Y = Image.open("/Users/shimanofallah/dropbox/MP_0270 crop 1_mask.tif")
+X = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/test_500.tif")
+Y = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/test_500_mask.tif")
+Xdata = np.array(X)
+Ydata = np.array(Y)
 # compute the features and change dimensions
-features = computeFeature(X, [3, 15, 8, 4, 2])
+features = computeFeature(Xdata, [3, 15, 8, 4, 2])
 resized_features = np.resize(features, 
                              (features.shape[0]*features.shape[1], features.shape[2]))
-resized_labels = np.resize(Y, (Y.shape[0]*Y.shape[1],1))
+resized_labels = np.resize(Ydata, (Ydata.shape[0]*Ydata.shape[1],1))
 
 
 # Split into training and test set
