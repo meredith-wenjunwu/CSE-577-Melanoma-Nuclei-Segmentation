@@ -139,41 +139,14 @@ pred_val = base_tree.predict(pca_validate)
 error_train = 1 - accuracy_score(Y_train, pred_train)
 error_val = 1 - accuracy_score(Y_validate, pred_val)
 
-training_pred = []
-validation_pred = []
-train_err_M = []
-val_err_M = []
+stopEps = 0.01
+[pred_train , pred_val , error_train , error_val, iterations] = Adaboost(pca_train ,Y_train , pca_validate, Y_validate, error_val, base_tree,stopEps)
 
-training_pred.append(pred_train)
-validation_pred.append(pred_val)
-train_err_M.append(error_train)
-val_err_M.append(error_val)
-    
-##(Shima) should put a stopping point
-##(Shima) should change testings with validation and add testing oart at the end
-stop = False
-epsilon = 0.01
-Ada_iter = 0     #Number of iterations for adaboost     
-while(stop == False):
-    Ada_iter = Ada_iter +1
-    past_error_val = error_val.copy()
-    ## Comment: missing iteration numbers for Adaboost
-    [pred_train , pred_val , error_train , error_val ] = Adaboost(pca_train , Y_train , pca_validate, Y_validate, past_error_val, base_tree)
-    training_pred.append(pred_train)
-    validation_pred.append(pred_val)
-    train_err_M.append(error_train)
-    val_err_M.append(error_val)
-    
-    check = np.amax(np.absolute(past_error_val-error_val))
-    if check < epsilon:
-        stop = True
-    
-
-iRange=np.arange(1, Ada_iter+10, 10)
-trainERR,= plt.plot(iRange,train_err_M,'g')
-valERR,= plt.plot(iRange,val_err_M,'r')
-
-plt.xlabel('iterations')
-plt.ylabel('Errors')
-plt.legend([trainERR,valERR], ["Training error","Validation error"])
-plt.show() 
+#iRange=np.arange(1, iterations)
+#trainERR,= plt.plot(iRange,train_err_M,'g')
+#valERR,= plt.plot(iRange,val_err_M,'r')
+#
+#plt.xlabel('iterations')
+#plt.ylabel('Errors')
+#plt.legend([trainERR,valERR], ["Training error","Validation error"])
+#plt.show() 
