@@ -1,24 +1,25 @@
-#!/usr/bin/env python2
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Nov 6 18:26:58 2017
-
-@author: shima
-"""
-
 import numpy as np
 
-#### Functions
-
-def Adaboost(X_train , Y_train , X_test, Y_test, iterations, classifier):
+def Adaboost(X_train , Y_train , X_test, Y_test, past_error, classifier,stopEps):
 
     # Initialize
     w = np.ones(X_train.shape[0]) / X_train.shape[0]
+    
     pred_train = np.zeros(X_train.shape[0])
     pred_test =  np.zeros(X_test.shape[0])
     
-    for i in range(iterations):
-        # Fit a classifier 
+    training_pred = []
+    testing_pred = []
+    train_err_M = []
+    test_err_M = []
+    error_test = past_error
+    stop = False
+    Ada_iter = 0
+    
+    while(stop == False):
+        Ada_iter = Ada_iter +1
+        past_error_test = error_test.copy()
+        
         classifier.fit(X_train, Y_train, w)
         pred_train_i = classifier.predict(X_train)     
         pred_test_i = classifier.predict(X_test)
@@ -43,11 +44,21 @@ def Adaboost(X_train , Y_train , X_test, Y_test, iterations, classifier):
         pred_test = [x.sum() for x in zip(pred_test, 
                                          [x * alpha for x in pred_test_i])]
     
-    pred_train = np.sign(pred_train)
-    pred_test = np.sign(pred_test)
+        pred_train = np.sign(pred_train)
+        pred_test = np.sign(pred_test)
     
-    error_train= sum(pred_train != Y_train) / float(Y_train.shape[0])
-    error_test = sum(pred_test != Y_test) / float(Y_test.shape[0])
+        error_train= sum(pred_train != Y_train) / float(Y_train.shape[0])
+        error_test = sum(pred_test != Y_test) / float(Y_test.shape[0])
     
-    return pred_train , pred_test , error_train , error_test
-
+    
+        training_pred.append(pred_train)
+        testing_pred.append(pred_test)
+        train_err_M.append(error_train)
+        test_err_M.append(error_test)
+    
+        check = np.amax(np.absolute(past_error_test-error_test))
+        if check < stopEps:
+            stop = True
+    
+    ### Do we want all the errror on iterations or only the last one?
+    return pred_train , pred_test , error_train , error_test , Ada_iter
