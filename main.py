@@ -1,12 +1,13 @@
 
 #### Main
-import AdaBoost
+from AdaBoost import *
 import feature
 import numpy as np
 from sklearn.decomposition import PCA
 from PIL import Image
 import matplotlib.pyplot as plt
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
 
 # =============================================================================
 # Calculate Features, concatenate them, return.
@@ -102,11 +103,11 @@ def reduceFeatures(feature_train, Y_train, feature_validate, Y_validate,
 #   variance ratio
 # =============================================================================
 def doPCA(data, threshold):
-    fTotal = data.shape[2]
+    fTotal = data.shape[1]
     for i in xrange(1,fTotal):
         pca = PCA(n_components = i)
         pca.fit(data)
-        if (pca.explained_variance_ratio_ > threshold):
+        if (sum(pca.explained_variance_ratio_) > threshold):
             return (pca, i)
     return (pca, fTotal)
 
@@ -133,10 +134,10 @@ base_tree = DecisionTreeClassifier(max_depth = 1, random_state = 1)
 #errors and predictions before adaboost
 base_tree.fit(pca_train,Y_train)
 pred_train = base_tree.predict(pca_train)
-pred_val = base_tree.predict(pca_train)
+pred_val = base_tree.predict(pca_validate)
     
-error_train= sum(pred_train != pca_train) / float(Y_train.shape[0])
-error_val = sum(pred_val != pca_validate) / float(Y_validate.shape[0])
+error_train = 1 - accuracy_score(Y_train, pred_train)
+error_val = 1 - accuracy_score(Y_validate, pred_val)
 
 training_pred = []
 validation_pred = []
@@ -156,6 +157,7 @@ Ada_iter = 0     #Number of iterations for adaboost
 while(stop == False):
     Ada_iter = Ada_iter +1
     past_error_val = error_val.copy()
+    ## Comment: missing iteration numbers for Adaboost
     [pred_train , pred_val , error_train , error_val ] = Adaboost(pca_train , Y_train , pca_validate, Y_validate, past_error_val, base_tree)
     training_pred.append(pred_train)
     validation_pred.append(pred_val)
