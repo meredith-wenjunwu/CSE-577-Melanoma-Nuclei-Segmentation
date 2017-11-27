@@ -61,11 +61,11 @@ def dataset_split(X,Y,valid_split_rate,test_split_rate):
     rows = X.shape[0]
     arr = np.arange(rows)
     np.random.shuffle(arr)
-    X_shuffle = X[rows]
-    Y_shuffle = Y[rows]
+    X_shuffle = X[arr]
+    Y_shuffle = Y[arr]
     
     test_split = int(test_split_rate*X.shape[0])
-    validate_split = int((valid_split_rate*test_split*X.shape[0]))
+    validate_split = int((valid_split_rate*test_split))
     X_tr = X_shuffle[:test_split]
     Y_tr = Y_shuffle[:test_split]
     X_train = X_tr[:validate_split]
