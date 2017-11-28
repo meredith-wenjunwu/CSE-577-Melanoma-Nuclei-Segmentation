@@ -5,13 +5,16 @@ def AdaBoost(X_train , Y_train , X_test, Y_test, M, classifier):
     # Initialize
     w = np.ones(X_train.shape[0]) / X_train.shape[0]
     
-    pred_train = np.zeros(X_train.shape[0])
-    pred_test =  np.zeros(X_test.shape[0])
+    pred_train = np.zeros((X_train.shape[0],1))
+    pred_test =  np.zeros((X_test.shape[0],1))
     
     for i in range(M):
         classifier.fit(X_train, Y_train, sample_weight = w)
-        pred_train_i = classifier.predict(X_train)     
-        pred_test_i = classifier.predict(X_test)
+        pred_train_i = np.zeros((Y_train.shape[0],1))
+        pred_test_i = np.zeros((Y_test.shape[0],1))
+        
+        pred_train_i[:,0] = classifier.predict(X_train)     
+        pred_test_i[:,0] = classifier.predict(X_test)
         
 #        wrongPrediction = [int(P) for P in (pred_train_i != Y_train)]
         wrongPrediction = (pred_train_i != Y_train).astype(int)

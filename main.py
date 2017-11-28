@@ -110,8 +110,8 @@ def doPCA(data, threshold):
             return (pca, i)
     return (pca, fTotal)
 
-X = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/test_500.tif")
-Y = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/test_500_mask.tif")
+X = Image.open("/Users/shimanofallah/Dropbox/test_500.tif")
+Y = Image.open("/Users/shimanofallah/Dropbox/test_500_mask.tif")
 Xdata = np.array(X)
 Ydata = np.array(Y)
 # compute the features and change dimensions
