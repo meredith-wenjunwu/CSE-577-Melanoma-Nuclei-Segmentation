@@ -58,25 +58,20 @@ def computeFeature(input, windowSizeArray, norm = 1):
 #           later to used in Adaboost training
 # =============================================================================
     
-def dataset_split(X,Y,valid_split_rate,test_split_rate):
+def dataset_split(X,Y,valid_split_rate):
     rows = X.shape[0]
     arr = np.arange(rows)
     np.random.shuffle(arr)
     X_shuffle = X[arr]
     Y_shuffle = Y[arr]
     
-    test_split = int(test_split_rate*X.shape[0])
-    validate_split = int((valid_split_rate*test_split))
-    X_tr = X_shuffle[:test_split]
-    Y_tr = Y_shuffle[:test_split]
-    X_train = X_tr[:validate_split]
-    Y_train = Y_tr[:validate_split]
-    X_validate = X_tr[validate_split:]
-    Y_validate = Y_tr[validate_split:]
-    X_test = X_shuffle[test_split:]
-    Y_test = Y_shuffle[test_split:]
+    validate_split = int(valid_split_rate*X.shape[0])
+    X_train = X_shuffle[:validate_split]
+    Y_train = Y_shuffle[:validate_split]
+    X_validate = X_shuffle[validate_split:]
+    Y_validate = Y_shuffle[validate_split:]
     
-    return X_train, Y_train , X_validate, Y_validate ,X_test , Y_test
+    return X_train, Y_train , X_validate, Y_validate 
     
     # Compute Features, I assume:
     # X_train is training data, Y_train is training label
@@ -119,15 +114,26 @@ Y = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/test_500_mask.tif")
 
 Xdata = np.array(X)
 Ydata = np.array(Y)
+
 # compute the features and change dimensions
 features = computeFeature(Xdata, [3, 15, 8, 4, 2])
 resized_features = np.resize(features, 
                              (features.shape[0]*features.shape[1], features.shape[2]))
 resized_labels = np.resize(Ydata, (Ydata.shape[0]*Ydata.shape[1],1))
 
+# Split into training and validation set
+[X_train, Y_train , X_validate, Y_validate] = dataset_split(resized_features,resized_labels,0.9,0.8)      
 
-# Split into training and test set
-[X_train, Y_train , X_validate, Y_validate ,X_test , Y_test] = dataset_split(resized_features,resized_labels,0.9,0.8)        
+################## Testing Data
+#X_t = Image.open("/Users/shimanofallah/Dropbox/test_500.tif")
+#Y_t = Image.open("/Users/shimanofallah/Dropbox/test_500_mask.tif")
+Xdata_t = np.array(X_t)
+Ydata_t = np.array(Y_t)
+features_t = computeFeature(Xdata_t, [3, 15, 8, 4, 2])
+X_test = np.resize(features_t, 
+                             (features_t.shape[0]*features_t.shape[1], features_t.shape[2]))
+Y_test = np.resize(Ydata_t, (Ydata_t.shape[0]*Ydata_t.shape[1],1))
+  
 # reduce feature dimension
 [pca_train, Y_train, pca_validate, Y_validate, pca_test, Y_test] = reduceFeatures(X_train, Y_train , X_validate, Y_validate ,X_test , Y_test)      
 
