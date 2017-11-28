@@ -6,6 +6,7 @@ from sklearn.decomposition import PCA
 from PIL import Image
 import matplotlib.pyplot as plt
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import AdaBoostClassifier
 from sklearn.metrics import accuracy_score
 
 # =============================================================================
@@ -113,8 +114,8 @@ def doPCA(data, threshold):
 #X = Image.open("/Users/shimanofallah/Dropbox/test_500.tif")
 #Y = Image.open("/Users/shimanofallah/Dropbox/test_500_mask.tif")
 
-X = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/test_100.tif")
-Y = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/test_100_mask.tif")
+X = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/test_500.tif")
+Y = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/test_500_mask.tif")
 
 Xdata = np.array(X)
 Ydata = np.array(Y)
@@ -130,31 +131,45 @@ resized_labels = np.resize(Ydata, (Ydata.shape[0]*Ydata.shape[1],1))
 # reduce feature dimension
 [pca_train, Y_train, pca_validate, Y_validate, pca_test, Y_test] = reduceFeatures(X_train, Y_train , X_validate, Y_validate ,X_test , Y_test)      
 
-# Fit a simple decision tree first
-base_tree = DecisionTreeClassifier(max_depth = 1, random_state = 1)
+# Try built-in decision tree
+bdt = AdaBoostClassifier(DecisionTreeClassifier(max_depth=1),
+                         algorithm="SAMME.R",
+                         n_estimators=30)
 
-base_tree.fit(pca_train,Y_train)
-pred_train = base_tree.predict(pca_train)
-pred_val = base_tree.predict(pca_validate)   
-error_train = 1 - accuracy_score(Y_train, pred_train)
-error_val = 1 - accuracy_score(Y_validate, pred_val)
+bdt.fit(pca_train, Y_train.ravel())
+bdt_train = bdt.predict(pca_train)
+bdt_val = bdt.predict(pca_validate) 
+bdt_test = bdt.predict(pca_test)
+error_train = 1 - accuracy_score(Y_train, bdt_train)
+error_val = 1 - accuracy_score(Y_validate, bdt_val)
+error_test = 1 - accuracy_score(Y_test, bdt_test) 
 
-
-
-er_train = [error_train]
-er_val = [error_val]
-iteration=50
-
-for i in range(10, iteration+10, 10):
-    [error_train, error_val] = AdaBoost(pca_train ,Y_train , pca_validate, Y_validate, i, base_tree)
-    er_train.append(error_train)
-    er_val.append(error_val)
-
-
-D = range(0, iteration+10, 10)    
-TR,= plt.plot(D,er_train)
-TE,= plt.plot(D,er_val)
-plt.legend([TR,TE], ["Training data","Testing data"])
-plt.xlabel('iteration')
-plt.ylabel('Error')
-plt.show()
+#
+## Fit a simple decision tree first
+#base_tree = DecisionTreeClassifier(max_depth = 1, random_state = 1)
+#
+#base_tree.fit(pca_train,Y_train)
+#pred_train = base_tree.predict(pca_train)
+#pred_val = base_tree.predict(pca_validate)   
+#error_train = 1 - accuracy_score(Y_train, pred_train)
+#error_val = 1 - accuracy_score(Y_validate, pred_val)
+#
+#
+#
+#er_train = [error_train]
+#er_val = [error_val]
+#iteration=50
+#
+#for i in range(10, iteration+10, 10):
+#    [error_train, error_val] = AdaBoost(pca_train ,Y_train , pca_validate, Y_validate, i, base_tree)
+#    er_train.append(error_train)
+#    er_val.append(error_val)
+#
+#
+#D = range(0, iteration+10, 10)    
+#TR,= plt.plot(D,er_train)
+#TE,= plt.plot(D,er_val)
+#plt.legend([TR,TE], ["Training data","Testing data"])
+#plt.xlabel('iteration')
+#plt.ylabel('Error')
+#plt.show()
