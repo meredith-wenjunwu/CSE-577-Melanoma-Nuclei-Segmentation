@@ -61,6 +61,8 @@ def computeFeature(input, windowSizeArray, norm = 1):
 def dataset_split(X,Y,valid_split_rate):
     rows = X.shape[0]
     arr = np.arange(rows)
+    SEED = 928
+    np.random.seed(SEED)
     np.random.shuffle(arr)
     X_shuffle = X[arr]
     Y_shuffle = Y[arr]
