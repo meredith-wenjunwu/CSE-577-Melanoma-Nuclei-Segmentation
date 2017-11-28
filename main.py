@@ -1,10 +1,10 @@
 #### Main
-from AdaBoost import *
+#from AdaBoost import *
 import feature
 import numpy as np
 from sklearn.decomposition import PCA
 from PIL import Image
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.metrics import accuracy_score
@@ -106,11 +106,11 @@ def doPCA(data, threshold):
             return (pca, i)
     return (pca, fTotal)
 
-#X = Image.open("/Users/shimanofallah/Dropbox/test_500.tif")
-#Y = Image.open("/Users/shimanofallah/Dropbox/test_500_mask.tif")
+X = Image.open("/Users/shimanofallah/Dropbox/Small images-1/train_500.tif")
+Y = Image.open("/Users/shimanofallah/Dropbox/Small images-1/train_500_mask.tif")
 
-X = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/test_500.tif")
-Y = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/test_500_mask.tif")
+#X = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/test_500.tif")
+#Y = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/test_500_mask.tif")
 
 Xdata = np.array(X)
 Ydata = np.array(Y)
@@ -122,11 +122,11 @@ resized_features = np.resize(features,
 resized_labels = np.resize(Ydata, (Ydata.shape[0]*Ydata.shape[1],1))
 
 # Split into training and validation set
-[X_train, Y_train , X_validate, Y_validate] = dataset_split(resized_features,resized_labels,0.9,0.8)      
+[X_train, Y_train , X_validate, Y_validate] = dataset_split(resized_features,resized_labels,0.9)      
 
 ################## Testing Data
-#X_t = Image.open("/Users/shimanofallah/Dropbox/test_500.tif")
-#Y_t = Image.open("/Users/shimanofallah/Dropbox/test_500_mask.tif")
+X_t = Image.open("/Users/shimanofallah/Dropbox/Small images-1/test_500.tif")
+Y_t = Image.open("/Users/shimanofallah/Dropbox/Small images-1/test_500_mask.tif")
 Xdata_t = np.array(X_t)
 Ydata_t = np.array(Y_t)
 features_t = computeFeature(Xdata_t, [3, 15, 8, 4, 2])
