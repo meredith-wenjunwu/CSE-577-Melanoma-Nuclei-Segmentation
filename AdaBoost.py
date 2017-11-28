@@ -13,8 +13,9 @@ def AdaBoost(X_train , Y_train , X_test, Y_test, M, classifier):
         pred_train_i = classifier.predict(X_train)     
         pred_test_i = classifier.predict(X_test)
         
-        wrongPrediction = [int(P) for P in (pred_train_i != Y_train)]
-
+#        wrongPrediction = [int(P) for P in (pred_train_i != Y_train)]
+        wrongPrediction = (pred_train_i != Y_train).astype(int)
+        
         predVect = [s if s==1 else -1 for s in wrongPrediction]   
         
         err = np.dot(w,wrongPrediction) / sum(w)
