@@ -110,8 +110,18 @@ def doPCA(data, threshold):
             return (pca, i)
     return (pca, fTotal)
 
+<<<<<<< Updated upstream
 X = Image.open("/Users/shimanofallah/Dropbox/test_500.tif")
 Y = Image.open("/Users/shimanofallah/Dropbox/test_500_mask.tif")
+=======
+<<<<<<< HEAD
+X = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/test_100.tif")
+Y = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/test_100_mask.tif")
+=======
+X = Image.open("/Users/shimanofallah/Dropbox/test_500.tif")
+Y = Image.open("/Users/shimanofallah/Dropbox/test_500_mask.tif")
+>>>>>>> origin/master
+>>>>>>> Stashed changes
 Xdata = np.array(X)
 Ydata = np.array(Y)
 # compute the features and change dimensions
@@ -139,7 +149,7 @@ error_val = 1 - accuracy_score(Y_validate, pred_val)
 
 er_train = [error_train]
 er_val = [error_val]
-iteration=400
+iteration=50
 
 for i in range(10, iteration+10, 10):
     [error_train, error_val] = AdaBoost(pca_train ,Y_train , pca_validate, Y_validate, i, base_tree)
