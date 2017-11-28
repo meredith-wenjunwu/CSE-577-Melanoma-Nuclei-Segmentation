@@ -106,11 +106,11 @@ def doPCA(data, threshold):
             return (pca, i)
     return (pca, fTotal)
 
-X = Image.open("/Users/shimanofallah/Dropbox/Small images-1/train_500.tif")
-Y = Image.open("/Users/shimanofallah/Dropbox/Small images-1/train_500_mask.tif")
+#X = Image.open("/Users/shimanofallah/Dropbox/Small images-1/train_500.tif")
+#Y = Image.open("/Users/shimanofallah/Dropbox/Small images-1/train_500_mask.tif")
 
-#X = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/test_500.tif")
-#Y = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/test_500_mask.tif")
+X = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/train_500.tif")
+Y = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/train_500_mask.tif")
 
 Xdata = np.array(X)
 Ydata = np.array(Y)
@@ -125,8 +125,8 @@ resized_labels = np.resize(Ydata, (Ydata.shape[0]*Ydata.shape[1],1))
 [X_train, Y_train , X_validate, Y_validate] = dataset_split(resized_features,resized_labels,0.9)      
 
 ################## Testing Data
-X_t = Image.open("/Users/shimanofallah/Dropbox/Small images-1/test_500.tif")
-Y_t = Image.open("/Users/shimanofallah/Dropbox/Small images-1/test_500_mask.tif")
+X_t = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/test_500.tif")
+Y_t = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/test_500_mask.tif")
 Xdata_t = np.array(X_t)
 Ydata_t = np.array(Y_t)
 features_t = computeFeature(Xdata_t, [3, 15, 8, 4, 2])
@@ -149,6 +149,29 @@ bdt_test = bdt.predict(pca_test)
 error_train = 1 - accuracy_score(Y_train, bdt_train)
 error_val = 1 - accuracy_score(Y_validate, bdt_val)
 error_test = 1 - accuracy_score(Y_test, bdt_test) 
+
+# =============================================================================
+# Visualization
+# =============================================================================
+# Reshape to image size
+reshaped_arr = np.resize(bdt_test, 
+                             (Xdata.shape[0], Xdata.shape[1]))
+im = Image.fromarray(reshaped_arr)
+im.save("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/output.jpeg")
+#Convert reshaped array to binary mask
+reshaped_arr = reshaped_arr != 0
+layer1 = Xdata_t[:,:,0]
+layer2 = Xdata_t[:,:,1]
+layer3 = Xdata_t[:,:,2]
+layer1[reshaped_arr] = 0
+layer2[reshaped_arr] = 0
+layer3[reshaped_arr] = 0
+overlay = np.zeros((Xdata.shape[0], Xdata.shape[1], Xdata.shape[2]),'uint8')
+overlay[:,:,0] = layer1
+overlay[:,:,1] = layer2
+overlay[:,:,2] = layer3
+im2 = Image.fromarray(overlay, 'RGB')
+im2.save("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/output_overlay.jpeg")
 
 #
 ## Fit a simple decision tree first
