@@ -3,7 +3,7 @@ from sklearn.metrics import accuracy_score
 
 def AdaBoost(X_train , Y_train , X_test, Y_test, M, classifier):
     # Initialize
-    w = np.ones(X_train.shape[0]) / X_train.shape[0]
+    w = np.ones((X_train.shape[0],1)) / X_train.shape[0]
     
     pred_train = np.zeros((X_train.shape[0],1))
     pred_test =  np.zeros((X_test.shape[0],1))

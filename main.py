@@ -110,18 +110,12 @@ def doPCA(data, threshold):
             return (pca, i)
     return (pca, fTotal)
 
-<<<<<<< Updated upstream
-X = Image.open("/Users/shimanofallah/Dropbox/test_500.tif")
-Y = Image.open("/Users/shimanofallah/Dropbox/test_500_mask.tif")
-=======
-<<<<<<< HEAD
+#X = Image.open("/Users/shimanofallah/Dropbox/test_500.tif")
+#Y = Image.open("/Users/shimanofallah/Dropbox/test_500_mask.tif")
+
 X = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/test_100.tif")
 Y = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/test_100_mask.tif")
-=======
-X = Image.open("/Users/shimanofallah/Dropbox/test_500.tif")
-Y = Image.open("/Users/shimanofallah/Dropbox/test_500_mask.tif")
->>>>>>> origin/master
->>>>>>> Stashed changes
+
 Xdata = np.array(X)
 Ydata = np.array(Y)
 # compute the features and change dimensions
