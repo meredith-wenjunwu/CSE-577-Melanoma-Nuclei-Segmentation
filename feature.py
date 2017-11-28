@@ -146,11 +146,12 @@ def computeFeature(input, windowSizeArray, norm = 1):
         adjacentHF = adjacentHLFeatures(input, windowSizeArray[1], windowSizeArray[2])
         return np.concatenate((pixelF, adjacentHF), axis = 2)
     elif (len(windowSizeArray) == 4):
-        pixelF = pixelFeature(input, windowSizeArray[0])
-        adjacentHLF = adjacentHLFeatures(input, windowSizeArray[1], windowSizeArray[2])
-        nonadjacentHLF = nonadjacentHLFeatures1(input, windowSizeArray[1], 
-                                            windowSizeArray[2], windowSizeArray[3], norm)
-        return np.concatenate((pixelF,adjacentHLF, nonadjacentHLF), axis = 2)
+        adjacentHLF = adjacentHLFeatures(input, windowSizeArray[0], windowSizeArray[1])
+        nonadjacentHLF = nonadjacentHLFeatures1(input, windowSizeArray[0], 
+                                            windowSizeArray[1], windowSizeArray[2], norm)
+        nonadjacentHLF2 = nonadjacentHLFeatures2(input, windowSizeArray[0], windowSizeArray[1], 
+                                             windowSizeArray[2], windowSizeArray[3], norm)
+        return np.concatenate((pixelF,adjacentHLF, nonadjacentHLF, nonadjacentHLF2), axis = 2)
     elif (len(windowSizeArray) == 5):
         pixelF = pixelFeature(input, windowSizeArray[0])
         adjacentHLF = adjacentHLFeatures(input, windowSizeArray[1], windowSizeArray[2])
