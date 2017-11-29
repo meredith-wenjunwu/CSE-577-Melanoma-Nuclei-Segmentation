@@ -7,7 +7,7 @@ from PIL import Image
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.metrics import accuracy_score
-
+import optimization
 
 
 
@@ -18,11 +18,10 @@ from sklearn.metrics import accuracy_score
 #           later to used in Adaboost training
 # =============================================================================
     
-def dataset_split(X,Y,valid_split_rate):
+def dataset_split(X,Y,valid_split_rate, seed):
     rows = X.shape[0]
     arr = np.arange(rows)
-    SEED = 928
-    np.random.seed(SEED)
+    np.random.seed(seed)
     np.random.shuffle(arr)
     X_shuffle = X[arr]
     Y_shuffle = Y[arr]
@@ -66,26 +65,35 @@ def visualize(testresult, Xdata_t):
 #X = Image.open("/Users/shimanofallah/Dropbox/Small images-1/train_500.tif")
 #Y = Image.open("/Users/shimanofallah/Dropbox/Small images-1/train_500_mask.tif")
 
-X = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/train_500.tif")
-Y = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/train_500_mask.tif")
+X = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/train_100.tif")
+Y = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/train_100_mask.tif")
 
 Xdata = np.array(X)
-Ydata = np.array(Y)
+
+Ydata = np.array(Y).astype(int)
+Ydata[Ydata != 0] = 1
+Ydata[Ydata == 0] = -1
 
 # compute the features and change dimensions
-features = feature.computeFeature(Xdata, [3, 15, 8, 4, 2])
-resized_features = np.resize(features, 
-                             (features.shape[0]*features.shape[1], features.shape[2]))
+#features = feature.computeFeature(Xdata, [3, 15, 8, 4, 2])
+#feature.computeAllPixelFeatures(Xdata)
+feature.computeAllHaarlikeFeatures(Xdata)
+#resized_features = np.resize(features, 
+#                             (features.shape[0]*features.shape[1], features.shape[2]))
 resized_labels = np.resize(Ydata, (Ydata.shape[0]*Ydata.shape[1],1))
 
 # Split into training and validation set
-[X_train, Y_train , X_validate, Y_validate] = dataset_split(resized_features,resized_labels,0.9)      
+# set seed for shuffle
+SEED = 928
+[X_train, Y_train , X_validate, Y_validate] = dataset_split(resized_features,resized_labels,0.9, SEED)      
 
 ################## Testing Data
 X_t = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/test_500.tif")
 Y_t = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/test_500_mask.tif")
 Xdata_t = np.array(X_t)
-Ydata_t = np.array(Y_t)
+Ydata_t = np.array(Y_t).astype(int)
+Ydata_t[Ydata_t != 0] = 1
+Ydata_t[Ydata_t == 0] = -1
 features_t = feature.computeFeature(Xdata_t, [3, 15, 8, 4, 2])
 X_test = np.resize(features_t, 
                              (features_t.shape[0]*features_t.shape[1], features_t.shape[2]))
