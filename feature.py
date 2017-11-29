@@ -122,6 +122,10 @@ def nonadjacentHLFeatures2(input_image, window1, window2, window3, window4, norm
         - sum(sum(window1))
     return features
 
+# Calculate line features using SIFT
+def lineFeatures(input_image):
+    
+    return 0
 
 # =============================================================================
 # Calculate Features, concatenate them, return.
@@ -198,7 +202,7 @@ def doPCA(data, threshold):
 # Contatenate all the features together
 # Save as csv
 # =============================================================================
-def computeAllPixelFeatures(Xdata):
+def computeAllPixelFeatures(Xdata, isTraining):
     pixelw = [3, 5, 9, 15, 19, 25]
     pixelF = np.zeros((Xdata.shape[0], Xdata.shape[1], 
                        Xdata.shape[2] * 4 * len(pixelw)))
@@ -208,49 +212,67 @@ def computeAllPixelFeatures(Xdata):
         pixelF[:,:,index: index + Xdata.shape[2] * 4] = f
     resized_pixelF = np.resize(pixelF, 
                              (pixelF.shape[0]*pixelF.shape[1], pixelF.shape[2]))
-    np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/pixelFeature.csv", 
-               resized_pixelF, delimiter=",")
+    if (isTraining):
+        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/pixelFeature_Tr.csv", 
+                   resized_pixelF, delimiter=",")
+    else: 
+        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/pixelFeature_Ts.csv", 
+                   resized_pixelF, delimiter=",")
 
-def computeAllHaarlikeFeatures(Xdata):
+# =============================================================================
+# Calculate Haar like features using all possible window sizes
+# Contatenate all the features together
+   # 21*8 + 11*8*8 + 11*4*4*4 = 1576 features 
+# Save as csv
+# =============================================================================
+def computeAllHaarlikeFeatures(Xdata, isTraining):
     # 21*8 + 11*8*8 + 11*4*4*4 = 1576 features
     # Compute all adjacent Haar-like box feature
-#    w1 = range(5,26)
-#    w2 = range(1,9)
-#    adjacentHLF = np.zeros((Xdata.shape[0], Xdata.shape[1], 
-#                             Xdata.shape[2] * len(w1) * len(w2)))
-#    
-#    for i in xrange(len(w1)):
-#        for j in xrange(len(w2)):
-#            f = adjacentHLFeatures(Xdata, w1[i], w2[j])
-#            index = i * len(w2) * Xdata.shape[2] + j * Xdata.shape[2]
-#            adjacentHLF[:,:,index:index + Xdata.shape[2]] = f
-#    
-#    resized_adjacentHLF = np.resize(adjacentHLF, 
-#                             (adjacentHLF.shape[0]*adjacentHLF.shape[1], adjacentHLF.shape[2]))
-#    np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/adjacentHLFeature.csv", 
-#               resized_adjacentHLF, delimiter=",")
-#
-#    # Compute all nonadjacent Haar-like feature 1
-#    w1 = range(5, 26, 2)
-#    w2 = range(1, 9)
-#    w3 = range(1, 9)
-#    
-#    nonadjacentHLF1 = np.zeros((Xdata.shape[0], Xdata.shape[1], 
-#                                Xdata.shape[2] * len(w1) * len(w2) * len(w3)))
-#    for i in xrange(len(w1)):
-#        for j in xrange(len(w2)):
-#            for k in xrange(len(w3)):
-#                f = nonadjacentHLFeatures1(Xdata, w1[i], w2[j], w3[k])
-#                index = (i*len(w2)*len(w3)*Xdata.shape[2] + 
-#                         j*len(w3)*Xdata.shape[2] + k*Xdata.shape[2])
-#                nonadjacentHLF1[:,:,index:index + Xdata.shape[2]] = f
-#    
-#    resized_nonadjacentHLF1 = np.resize(nonadjacentHLF1, 
-#                             (nonadjacentHLF1.shape[0]*nonadjacentHLF1.shape[1], nonadjacentHLF1.shape[2]))
-#    np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/anondjacentHLFeature1.csv", 
-#               resized_nonadjacentHLF1, delimiter=",")
-#    
-    # Compute all nonadjacent Haar-like feature 2
+    w1 = range(5,26)
+    w2 = range(1,9)
+    adjacentHLF = np.zeros((Xdata.shape[0], Xdata.shape[1], 
+                             Xdata.shape[2] * len(w1) * len(w2)))
+    
+    for i in xrange(len(w1)):
+        for j in xrange(len(w2)):
+            f = adjacentHLFeatures(Xdata, w1[i], w2[j])
+            index = i * len(w2) * Xdata.shape[2] + j * Xdata.shape[2]
+            adjacentHLF[:,:,index:index + Xdata.shape[2]] = f
+    
+    resized_adjacentHLF = np.resize(adjacentHLF, 
+                             (adjacentHLF.shape[0]*adjacentHLF.shape[1], adjacentHLF.shape[2]))
+    if (isTraining):
+        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/adjacentHLFeature_Tr.csv", 
+                   resized_adjacentHLF, delimiter=",")
+    else:
+        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/adjacentHLFeature_Ts.csv", 
+                   resized_adjacentHLF, delimiter=",")
+
+    # Compute all nonadjacent Haar-like feature 1
+    w1 = range(5, 26, 2)
+    w2 = range(1, 9)
+    w3 = range(1, 9)
+    
+    nonadjacentHLF1 = np.zeros((Xdata.shape[0], Xdata.shape[1], 
+                                Xdata.shape[2] * len(w1) * len(w2) * len(w3)))
+    for i in xrange(len(w1)):
+        for j in xrange(len(w2)):
+            for k in xrange(len(w3)):
+                f = nonadjacentHLFeatures1(Xdata, w1[i], w2[j], w3[k])
+                index = (i*len(w2)*len(w3)*Xdata.shape[2] + 
+                         j*len(w3)*Xdata.shape[2] + k*Xdata.shape[2])
+                nonadjacentHLF1[:,:,index:index + Xdata.shape[2]] = f
+    
+    resized_nonadjacentHLF1 = np.resize(nonadjacentHLF1, 
+                             (nonadjacentHLF1.shape[0]*nonadjacentHLF1.shape[1], nonadjacentHLF1.shape[2]))
+    if (isTraining):
+        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/anondjacentHLFeature1_Tr.csv", 
+                   resized_nonadjacentHLF1, delimiter=",")
+    else:
+        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/anondjacentHLFeature1_Ts.csv", 
+                   resized_nonadjacentHLF1, delimiter=",")
+    
+#     Compute all nonadjacent Haar-like feature 2
     w1 = range(5, 26, 2)
     w2 = range(1, 9, 2)
     w3 = range(1, 9, 2)
@@ -270,10 +292,23 @@ def computeAllHaarlikeFeatures(Xdata):
     
     resized_nonadjacentHLF2 = np.resize(nonadjacentHLF2, 
                              (nonadjacentHLF2.shape[0]*nonadjacentHLF2.shape[1], nonadjacentHLF2.shape[2]))
-    np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/nonadjacentHLFeature2.csv", 
-               resized_nonadjacentHLF2, delimiter=",")
+    if (isTraining):
+        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/nonadjacentHLFeature2_Tr.csv", 
+                   resized_nonadjacentHLF2, delimiter=",")
+    else:
+        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/nonadjacentHLFeature2_Ts.csv", 
+                   resized_nonadjacentHLF2, delimiter=",")
     
+    resized_all = np.concatenate((resized_adjacentHLF, resized_nonadjacentHLF1, resized_nonadjacentHLF2), axis = 1)
     
+    if (isTraining):
+        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/HLFeatures_Tr.csv", 
+                   resized_all, delimiter=",")
+    else:
+        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/HLFeatures_Ts.csv", 
+                   resized_all, delimiter=",")
+    
+
 
             
 # def main():
