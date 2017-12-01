@@ -7,6 +7,12 @@ import numpy as np
 #import random
 from sklearn.decomposition import PCA
 
+from scipy.ndimage.filters import gaussian_laplace
+from skimage.feature import structure_tensor_eigvals
+from skimage.feature import structure_tensor
+from skimage.feature import hessian_matrix
+from skimage.feature import hessian_matrix_eigvals
+from scipy.ndimage.filters import gaussian_gradient_magnitude
 
 # Caluculated pixel-related features with sliding window
 # ---sum of pixel values
@@ -309,8 +315,101 @@ def computeAllHaarlikeFeatures(Xdata, isTraining):
                    resized_all, delimiter=",")
     
 
-
-            
+def computeStructureFeatures(Xdata, isTraining):
+    # Separate color channel
+    RChannel = Xdata[:,:,0]
+    GChannel = Xdata[:,:,1]
+    BChannel = Xdata[:,:,2]
+    # Calculate Laplacian of Gaussian (sigma = 1.6)
+    gaussianLF_R = gaussian_laplace(RChannel, 1.6)
+    gaussianLF_G = gaussian_laplace(GChannel, 1.6)
+    gaussianLF_B = gaussian_laplace(BChannel, 1.6)
+    gaussianLF = np.dstack((gaussianLF_R, gaussianLF_G, gaussianLF_B))
+    gaussianLF = np.resize(gaussianLF, 
+                             (gaussianLF.shape[0]*gaussianLF.shape[1], gaussianLF.shape[2]))
+    if (isTraining):
+        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/gaussianLapFeatures_Tr.csv", 
+                   gaussianLF, delimiter=",")
+    else:
+        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/gaussianLapFeatures_Ts.csv", 
+                   gaussianLF, delimiter=",")
+        
+    # Calculate eigenvalues of structure tensor  (sigma =1.6, 3.5)
+    Axx_R1, Axy_R1, Ayy_R1 = structure_tensor(RChannel, sigma = 1.6)
+    larger_R1, smaller_R1 = structure_tensor_eigvals(Axx_R1, Axy_R1, Ayy_R1)
+    Axx_R2, Axy_R2, Ayy_R2 = structure_tensor(RChannel, sigma = 3.5)
+    larger_R2, smaller_R2 = structure_tensor_eigvals(Axx_R2, Axy_R2, Ayy_R2)
+    Axx_G1, Axy_G1, Ayy_G1 = structure_tensor(GChannel, sigma = 1.6)
+    larger_G1, smaller_G1 = structure_tensor_eigvals(Axx_G1, Axy_G1, Ayy_G1)
+    Axx_G2, Axy_G2, Ayy_G2 = structure_tensor(GChannel, sigma = 3.5)
+    larger_G2, smaller_G2 = structure_tensor_eigvals(Axx_G2, Axy_G2, Ayy_G2)
+    Axx_B1, Axy_B1, Ayy_B1 = structure_tensor(BChannel, sigma = 1.6)
+    larger_B1, smaller_B1 = structure_tensor_eigvals(Axx_B1, Axy_B1, Ayy_B1)
+    Axx_B2, Axy_B2, Ayy_B2 = structure_tensor(BChannel, sigma = 3.5)
+    larger_B2, smaller_B2 = structure_tensor_eigvals(Axx_B2, Axy_B2, Ayy_B2)
+    eigenST = np.dstack((larger_R1, smaller_R1, larger_R2, smaller_R2, 
+                              larger_G1, smaller_G1, larger_G2, smaller_G2, 
+                              larger_B1, smaller_B1, larger_B2, smaller_B2))
+    eigenST = np.resize(eigenST, 
+                             (eigenST.shape[0]*eigenST.shape[1], eigenST.shape[2]))
+    
+    if (isTraining):
+        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/eigenStructFeatures_Tr.csv", 
+                   eigenST, delimiter=",")
+    else:
+        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/eigenStructFeatures_Ts.csv", 
+                   eigenST, delimiter=",")
+        
+    # Calculate eigenvalues of Hessian matrix
+    Hrr_R1, Hrc_R1, Hcc_R1 = hessian_matrix(RChannel, sigma = 1.6)
+    larger_R1, smaller_R1 = hessian_matrix_eigvals(Hrr_R1, Hrc_R1, Hcc_R1)
+    Hrr_R2, Hrc_R2, Hcc_R2 = hessian_matrix(RChannel, sigma = 3.5)
+    larger_R2, smaller_R2 = hessian_matrix_eigvals(Hrr_R2, Hrc_R2, Hcc_R2)
+    Hrr_G1, Hrc_G1, Hcc_G1 = hessian_matrix(GChannel, sigma = 1.6)
+    larger_G1, smaller_G1 = hessian_matrix_eigvals(Hrr_G1, Hrc_G1, Hcc_G1)
+    Hrr_G2, Hrc_G2, Hcc_G2 = hessian_matrix(GChannel, sigma = 3.5)
+    larger_G2, smaller_G2 = hessian_matrix_eigvals(Hrr_G2, Hrc_G2, Hcc_G2)
+    Hrr_B1, Hrc_B1, Hcc_B1 = hessian_matrix(BChannel, sigma = 1.6)
+    larger_B1, smaller_B1 = hessian_matrix_eigvals(Hrr_B1, Hrc_B1, Hcc_B1)
+    Hrr_B2, Hrc_B2, Hcc_B2 = hessian_matrix(BChannel, sigma = 3.5)
+    larger_B2, smaller_B2 = hessian_matrix_eigvals(Hrr_B2, Hrc_B2, Hcc_B2)
+    eigenHess = np.dstack((larger_R1, smaller_R1, larger_R2, smaller_R2,
+                                larger_G1, smaller_G1, larger_G2, smaller_G2,
+                                larger_B1, smaller_B1, larger_B2, smaller_B2))
+    eigenHess = np.resize(eigenHess, 
+                             (eigenHess.shape[0]*eigenHess.shape[1], eigenHess.shape[2]))
+    
+    if (isTraining):
+        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/eigenHessFeatures_Tr.csv", 
+                   eigenHess, delimiter=",")
+    else:
+        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/eigenHessFeatures_Ts.csv", 
+                   eigenHess, delimiter=",")
+    
+    # Calculate Gaussian gradient magnitude (sigma = 1.6)
+    gaussian_grad_R = gaussian_gradient_magnitude(RChannel, sigma = 1.6)
+    gaussian_grad_G = gaussian_gradient_magnitude(GChannel, sigma = 1.6)
+    gaussian_grad_B = gaussian_gradient_magnitude(BChannel, sigma = 1.6)
+    gaussian_grad = np.dstack((gaussian_grad_R, gaussian_grad_G, 
+                                    gaussian_grad_B))
+    gaussian_grad = np.resize(gaussian_grad, 
+                             (gaussian_grad.shape[0]*gaussian_grad.shape[1], 
+                              gaussian_grad.shape[2]))
+    
+    if (isTraining):
+        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/gaussianGradFeatures_Tr.csv", 
+                   gaussian_grad, delimiter=",")
+    else:
+        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/gaussianGradFeatures_Ts.csv", 
+                   gaussian_grad, delimiter=",")
+    
+    All = np.concatenate((gaussianLF, eigenST, eigenHess, gaussian_grad),axis = 1)
+    if (isTraining):
+        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/structFeatures_Tr.csv", 
+                   All, delimiter=",")
+    else:
+        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/structFeatures_Ts.csv", 
+                   All, delimiter=",")
 # def main():
 #     im = Image.open('/Users/wuwenjun/Downloads/sample.jpg')
 #     imdata = np.array(im.getdata(), dtype=np.float64).reshape(im.size[1], im.size[0], 3)

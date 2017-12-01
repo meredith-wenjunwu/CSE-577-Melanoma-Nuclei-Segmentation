@@ -93,6 +93,10 @@ Y_test = np.resize(Ydata_t, (Ydata_t.shape[0]*Ydata_t.shape[1],1))
 # Feature Computation
 # =============================================================================
 #features = feature.computeFeature(Xdata, [3, 15, 8, 4, 2])
+
+feature.computeStructureFeatures(Xdata, True)
+feature.computeStructureFeatures(Xdata_t, False)
+
 feature.computeAllPixelFeatures(Xdata, True)
 feature.computeAllHaarlikeFeatures(Xdata, True)
 feature.computeAllPixelFeatures(Xdata_t, False)
@@ -107,12 +111,16 @@ feature.computeAllHaarlikeFeatures(Xdata_t, False)
   
 
 pixelF_Tr = np.genfromtxt ('/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/pixelFeature_Tr.csv', delimiter=",")
-HaarlikeF_Tr = np.genfromtxt ('/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/HLFeatures_Tr.csv', delimiter=",")
-allFeatures_Tr = np.concatenate((pixelF_Tr, HaarlikeF_Tr), axis = 1)
+haarlikeF_Tr = np.genfromtxt ('/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/HLFeatures_Tr.csv', delimiter=",")
+structF_Tr = np.genfromtext('/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/structFeatures_Tr.csv', delimiter=",")
+allFeatures_Tr = np.concatenate((pixelF_Tr, haarlikeF_Tr, structF_Tr), axis = 1)
 
 pixelF_Ts = np.genfromtxt ('/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/pixelFeature_Ts.csv', delimiter=",")
-HaarlikeF_Ts = np.genfromtxt ('/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/HLFeatures_Ts.csv', delimiter=",")
-X_test = np.concatenate((pixelF_Tr, HaarlikeF_Tr), axis = 1)
+haarlikeF_Ts = np.genfromtxt ('/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/HLFeatures_Ts.csv', delimiter=",")
+structF_Ts = np.genfromtext('/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/structFeatures_Ts.csv', delimiter=",")
+X_test = np.concatenate((pixelF_Ts, haarlikeF_Ts, structF_Ts), axis = 1)
+
+
 
 
 # ===========================Splitting & Training==============================
