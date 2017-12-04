@@ -361,17 +361,17 @@ def computeStructureFeatures(Xdata, isTraining):
                    eigenST, delimiter=",")
         
     # Calculate eigenvalues of Hessian matrix
-    Hrr_R1, Hrc_R1, Hcc_R1 = hessian_matrix(RChannel, sigma = 1.6)
+    Hrr_R1, Hrc_R1, Hcc_R1 = hessian_matrix(RChannel, sigma = 1.6, order='rc')
     larger_R1, smaller_R1 = hessian_matrix_eigvals(Hrr_R1, Hrc_R1, Hcc_R1)
-    Hrr_R2, Hrc_R2, Hcc_R2 = hessian_matrix(RChannel, sigma = 3.5)
+    Hrr_R2, Hrc_R2, Hcc_R2 = hessian_matrix(RChannel, sigma = 3.5, order='rc')
     larger_R2, smaller_R2 = hessian_matrix_eigvals(Hrr_R2, Hrc_R2, Hcc_R2)
-    Hrr_G1, Hrc_G1, Hcc_G1 = hessian_matrix(GChannel, sigma = 1.6)
+    Hrr_G1, Hrc_G1, Hcc_G1 = hessian_matrix(GChannel, sigma = 1.6, order='rc')
     larger_G1, smaller_G1 = hessian_matrix_eigvals(Hrr_G1, Hrc_G1, Hcc_G1)
-    Hrr_G2, Hrc_G2, Hcc_G2 = hessian_matrix(GChannel, sigma = 3.5)
+    Hrr_G2, Hrc_G2, Hcc_G2 = hessian_matrix(GChannel, sigma = 3.5, order='rc')
     larger_G2, smaller_G2 = hessian_matrix_eigvals(Hrr_G2, Hrc_G2, Hcc_G2)
-    Hrr_B1, Hrc_B1, Hcc_B1 = hessian_matrix(BChannel, sigma = 1.6)
+    Hrr_B1, Hrc_B1, Hcc_B1 = hessian_matrix(BChannel, sigma = 1.6, order='rc')
     larger_B1, smaller_B1 = hessian_matrix_eigvals(Hrr_B1, Hrc_B1, Hcc_B1)
-    Hrr_B2, Hrc_B2, Hcc_B2 = hessian_matrix(BChannel, sigma = 3.5)
+    Hrr_B2, Hrc_B2, Hcc_B2 = hessian_matrix(BChannel, sigma = 3.5, order='rc')
     larger_B2, smaller_B2 = hessian_matrix_eigvals(Hrr_B2, Hrc_B2, Hcc_B2)
     eigenHess = np.dstack((larger_R1, smaller_R1, larger_R2, smaller_R2,
                                 larger_G1, smaller_G1, larger_G2, smaller_G2,
