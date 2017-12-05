@@ -6,9 +6,8 @@ from PIL import Image
 #import matplotlib.pyplot as plt
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import AdaBoostClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score,f1_score,precision_recall_fscore_support
 import optimization
-from sklearn.datasets import make_gaussian_quantiles
 
 
 
@@ -135,26 +134,24 @@ SEED = 928
 # reduce feature dimension
 [pca_train, Y_train, pca_validate, Y_validate, pca_test, Y_test] = feature.reduceFeatures(X_train, Y_train , X_validate, Y_validate ,X_test , Y_test)      
 
-## Call optimization
-(learnrate, optimalEst) = optimization.optimizeAdaboost(pca_train, Y_train, pca_validate, Y_validate, 20)
-## Combine validation and training
-X_train = np.concatenate((pca_train, pca_validate), axis = 0)
-Y_train = np.concatenate((Y_train, Y_validate), axis = 0)
-
+# Try built-in decision tree
 bdt = AdaBoostClassifier(DecisionTreeClassifier(max_depth=1),
                          algorithm="SAMME.R",
-                         n_estimators=optimalEst,
-                         learning_rate = learnrate)
+                         n_estimators=30)
 
-bdt.fit(X_train, Y_train.ravel())
-bdt_train = bdt.predict(X_train)
+bdt.fit(pca_train, Y_train.ravel())
+bdt_train = bdt.predict(pca_train)
 bdt_val = bdt.predict(pca_validate) 
 bdt_test = bdt.predict(pca_test)
 error_train = 1 - accuracy_score(Y_train, bdt_train)
 error_val = 1 - accuracy_score(Y_validate, bdt_val)
 error_test = 1 - accuracy_score(Y_test, bdt_test) 
 
-
+### Calculate the metrics
+test_metrics = precision_recall_fscore_support(Gr, Xr)
+print 'Precision = ' , "%.4f" %test_metrics[0][0]
+print 'Recall = ' , "%.4f" %test_metrics[1][0]
+print 'F1 score = ' , "%.4f" %test_metrics[2][0]
 
 
 #
