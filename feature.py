@@ -227,14 +227,14 @@ def computeAllPixelFeatures(Xdata, isTraining):
     if (isTraining):
         print "\nComputed: pixelFeature_Tr in %f seconds\n" % (end-start)
 
-        with open('pixelFeature_Tr.pkl','wb') as outfile:
+        with open('featureArray/pixelFeature_Tr.pkl','wb') as outfile:
             pickle.dump(resized_pixelF, outfile, pickle.HIGHEST_PROTOCOL)
         #np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/pixelFeature_Tr.csv", 
                    #resized_pixelF, delimiter=",")
     else: 
         print "\nComputed: pixelFeature_Ts in %f seconds\n" % (end-start)
         
-        with open('pixelFeature_Ts.pkl','wb') as outfile:
+        with open('featureArray/pixelFeature_Ts.pkl','wb') as outfile:
             pickle.dump(resized_pixelF, outfile, pickle.HIGHEST_PROTOCOL)
 #        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/pixelFeature_Ts.csv", 
 #                   resized_pixelF, delimiter=",")
@@ -356,14 +356,14 @@ def computeAllHaarlikeFeatures(Xdata, isTraining):
     
     if (isTraining):
         print "\nFINISHED: Haar Like Features for Training data\n"
-        with open('HLFeatures_Tr.pkl','wb') as outfile:
+        with open('featureArray/HLFeatures_Tr.pkl','wb') as outfile:
             pickle.dump(resized_all, outfile, pickle.HIGHEST_PROTOCOL)
 #        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/HLFeatures_Tr.csv", 
 #                   resized_all, delimiter=",")
     else:
         print "\nFINISHED: Haar Like Features for Testing data\n"
         
-        with open('HLFeatures_Ts.pkl','wb') as outfile:
+        with open('featureArray/HLFeatures_Ts.pkl','wb') as outfile:
             pickle.dump(resized_all, outfile, pickle.HIGHEST_PROTOCOL)
 #        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/HLFeatures_Ts.csv", 
 #                   resized_all, delimiter=",")
@@ -499,14 +499,14 @@ def computeStructureFeatures(Xdata, isTraining):
     
     All = np.concatenate((gaussianLF, eigenST, eigenHess, gaussian_grad),axis = 1)
     if (isTraining):
-        with open('structFeatures_Tr.pkl','wb') as outfile:
+        with open('featureArray/structFeatures_Tr.pkl','wb') as outfile:
             pickle.dump(All, outfile, pickle.HIGHEST_PROTOCOL)
 #        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/structFeatures_Tr.csv", 
 #                   All, delimiter=",")
         print "\nFINISHED: Structure Features for Training data\n"
 
     else:   
-        with open('structFeatures_Ts.pkl','wb') as outfile:
+        with open('featureArray/structFeatures_Ts.pkl','wb') as outfile:
             pickle.dump(All, outfile, pickle.HIGHEST_PROTOCOL)
 #        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/structFeatures_Ts.csv", 
 #                   All, delimiter=",")
