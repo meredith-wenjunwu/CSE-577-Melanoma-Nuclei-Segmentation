@@ -71,8 +71,8 @@ def visualize(testresult, Xdata_t):
 #X = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/train_100.tif")
 #Y = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/train_100_mask.tif")
     
-X = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/train_100.tif")
-Y = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/train_100_mask.tif")
+X = Image.open("image_merged.tif")
+Y = Image.open("mask_merged.tif")
 Xdata = np.array(X)
 
 Ydata = np.array(Y).astype(int)
@@ -80,8 +80,8 @@ Ydata[Ydata != 0] = 1
 Ydata[Ydata == 0] = -1
 resized_labels = np.resize(Ydata, (Ydata.shape[0]*Ydata.shape[1],1))
 ################## Testing Data
-X_t = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/test_500.tif")
-Y_t = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/test_500_mask.tif")
+X_t = Image.open("test.tif")
+Y_t = Image.open("test_mask.tif")
 
 
 
