@@ -6,6 +6,7 @@ import numpy as np
 #from itertools import islice
 #import random
 from sklearn.decomposition import PCA
+import cPickle as pickle
 
 from scipy.ndimage.filters import gaussian_laplace
 from skimage.feature import structure_tensor_eigvals
@@ -13,7 +14,7 @@ from skimage.feature import structure_tensor
 from skimage.feature import hessian_matrix
 from skimage.feature import hessian_matrix_eigvals
 from scipy.ndimage.filters import gaussian_gradient_magnitude
-
+import time
 # Caluculated pixel-related features with sliding window
 # ---sum of pixel values
 # ---range of pixel values
@@ -209,7 +210,11 @@ def doPCA(data, threshold):
 # Save as csv
 # =============================================================================
 def computeAllPixelFeatures(Xdata, isTraining):
-    pixelw = [3, 5, 9, 15, 19, 25]
+    print("Computing: PixelFeatures")
+    print("is Training? %r" %isTraining)
+    start = time.time()
+    
+    pixelw = [3, 9, 15, 25]
     pixelF = np.zeros((Xdata.shape[0], Xdata.shape[1], 
                        Xdata.shape[2] * 4 * len(pixelw)))
     for i in xrange(len(pixelw)):
@@ -218,12 +223,21 @@ def computeAllPixelFeatures(Xdata, isTraining):
         pixelF[:,:,index: index + Xdata.shape[2] * 4] = f
     resized_pixelF = np.resize(pixelF, 
                              (pixelF.shape[0]*pixelF.shape[1], pixelF.shape[2]))
+    end = time.time()
     if (isTraining):
-        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/pixelFeature_Tr.csv", 
-                   resized_pixelF, delimiter=",")
+        print "\nComputed: pixelFeature_Tr in %f seconds\n" % (end-start)
+
+        with open('pixelFeature_Tr.pkl','wb') as outfile:
+            pickle.dump(resized_pixelF, outfile, pickle.HIGHEST_PROTOCOL)
+        #np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/pixelFeature_Tr.csv", 
+                   #resized_pixelF, delimiter=",")
     else: 
-        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/pixelFeature_Ts.csv", 
-                   resized_pixelF, delimiter=",")
+        print "\nComputed: pixelFeature_Ts in %f seconds\n" % (end-start)
+        
+        with open('pixelFeature_Ts.pkl','wb') as outfile:
+            pickle.dump(resized_pixelF, outfile, pickle.HIGHEST_PROTOCOL)
+#        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/pixelFeature_Ts.csv", 
+#                   resized_pixelF, delimiter=",")
 
 # =============================================================================
 # Calculate Haar like features using all possible window sizes
@@ -232,10 +246,16 @@ def computeAllPixelFeatures(Xdata, isTraining):
 # Save as csv
 # =============================================================================
 def computeAllHaarlikeFeatures(Xdata, isTraining):
+    print("Computing: All Haar-like Features")
+    print("is Training? %r" %isTraining)
     # 21*8 + 11*8*8 + 11*4*4*4 = 1576 features
     # Compute all adjacent Haar-like box feature
-    w1 = range(5,26)
-    w2 = range(1,9)
+    
+    print("Computing: adjacentHLFeature")
+    start = time.time()
+    
+    w1 = range(5,26, 5)
+    w2 = range(1,9,3)
     adjacentHLF = np.zeros((Xdata.shape[0], Xdata.shape[1], 
                              Xdata.shape[2] * len(w1) * len(w2)))
     
@@ -247,17 +267,26 @@ def computeAllHaarlikeFeatures(Xdata, isTraining):
     
     resized_adjacentHLF = np.resize(adjacentHLF, 
                              (adjacentHLF.shape[0]*adjacentHLF.shape[1], adjacentHLF.shape[2]))
+    end = time.time()
     if (isTraining):
-        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/adjacentHLFeature_Tr.csv", 
-                   resized_adjacentHLF, delimiter=",")
+        print "Computed: adjacentHLFeature_Tr in %f seconds" % (end-start)
+#        with open('adjacentHLFeature_Tr.pkl','wb') as outfile:
+#            pickle.dump(resized_adjacentHLF, outfile, pickle.HIGHEST_PROTOCOL)
+#        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/adjacentHLFeature_Tr.csv", 
+#                   resized_adjacentHLF, delimiter=",")
     else:
-        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/adjacentHLFeature_Ts.csv", 
-                   resized_adjacentHLF, delimiter=",")
+        print "Computed: adjacentHLFeature_Ts in %f seconds" % (end-start)
+#        with open('adjacentHLFeature_Ts.pkl','wb') as outfile:
+#            pickle.dump(resized_adjacentHLF, outfile, pickle.HIGHEST_PROTOCOL)
+#        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/adjacentHLFeature_Ts.csv", 
+#                   resized_adjacentHLF, delimiter=",")
 
     # Compute all nonadjacent Haar-like feature 1
-    w1 = range(5, 26, 2)
-    w2 = range(1, 9)
-    w3 = range(1, 9)
+    w1 = range(5, 26, 5)
+    w2 = range(1, 9, 3)
+    w3 = range(1, 9, 2)
+    print("Computing: Nonadjacent Haar-like feature 1")
+    start = time.time()
     
     nonadjacentHLF1 = np.zeros((Xdata.shape[0], Xdata.shape[1], 
                                 Xdata.shape[2] * len(w1) * len(w2) * len(w3)))
@@ -271,18 +300,27 @@ def computeAllHaarlikeFeatures(Xdata, isTraining):
     
     resized_nonadjacentHLF1 = np.resize(nonadjacentHLF1, 
                              (nonadjacentHLF1.shape[0]*nonadjacentHLF1.shape[1], nonadjacentHLF1.shape[2]))
+    end = time.time()
     if (isTraining):
-        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/anondjacentHLFeature1_Tr.csv", 
-                   resized_nonadjacentHLF1, delimiter=",")
+        print "Computed:nonadjacentHLFeature1_Tr in %f seconds" % (end-start)
+#        with open('nonadjacentHLFeature1_Tr.pkl','wb') as outfile:
+#            pickle.dump(resized_nonadjacentHLF1, outfile, pickle.HIGHEST_PROTOCOL)
+#        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/anondjacentHLFeature1_Tr.csv", 
+#                   resized_nonadjacentHLF1, delimiter=",")
     else:
-        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/anondjacentHLFeature1_Ts.csv", 
-                   resized_nonadjacentHLF1, delimiter=",")
+        print "Computed:nonadjacentHLFeature1_Ts in %f seconds" % (end-start)
+#        with open('nonadjacentHLFeature1_Ts.pkl','wb') as outfile:
+#            pickle.dump(resized_nonadjacentHLF1, outfile, pickle.HIGHEST_PROTOCOL)
+#        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/anondjacentHLFeature1_Ts.csv", 
+#                   resized_nonadjacentHLF1, delimiter=",")
     
 #     Compute all nonadjacent Haar-like feature 2
-    w1 = range(5, 26, 2)
-    w2 = range(1, 9, 2)
-    w3 = range(1, 9, 2)
-    w4 = range(1, 9, 2)
+    w1 = range(5, 26, 5)
+    w2 = range(1, 9, 3)
+    w3 = range(1, 9, 3)
+    w4 = range(1, 9, 3)
+    print("Computing: Nonadjacent Haar-like feature 2")
+    start = time.time()
     nonadjacentHLF2 = np.zeros((Xdata.shape[0], Xdata.shape[1], 
                                 Xdata.shape[2] * len(w1) * len(w2) * len(w3) * len(w4)))
     
@@ -298,43 +336,74 @@ def computeAllHaarlikeFeatures(Xdata, isTraining):
     
     resized_nonadjacentHLF2 = np.resize(nonadjacentHLF2, 
                              (nonadjacentHLF2.shape[0]*nonadjacentHLF2.shape[1], nonadjacentHLF2.shape[2]))
+    end = time.time()
     if (isTraining):
-        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/nonadjacentHLFeature2_Tr.csv", 
-                   resized_nonadjacentHLF2, delimiter=",")
+        print "Computed:nonadjacentHLFeature2_Tr in %f seconds" % (end-start)
+        
+#        with open('nonadjacentHLFeature2_Tr.pkl','wb') as outfile:
+#            pickle.dump(resized_nonadjacentHLF2, outfile, pickle.HIGHEST_PROTOCOL)
+#        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/nonadjacentHLFeature2_Tr.csv", 
+#                   resized_nonadjacentHLF2, delimiter=",")
     else:
-        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/nonadjacentHLFeature2_Ts.csv", 
-                   resized_nonadjacentHLF2, delimiter=",")
+        print "Computed:nonadjacentHLFeature2_Ts in %f seconds" % (end-start)
+        
+#        with open('nonadjacentHLFeature2_Ts.pkl','wb') as outfile:
+#            pickle.dump(resized_nonadjacentHLF2, outfile, pickle.HIGHEST_PROTOCOL)
+#        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/nonadjacentHLFeature2_Ts.csv", 
+#                   resized_nonadjacentHLF2, delimiter=",")
     
     resized_all = np.concatenate((resized_adjacentHLF, resized_nonadjacentHLF1, resized_nonadjacentHLF2), axis = 1)
     
     if (isTraining):
-        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/HLFeatures_Tr.csv", 
-                   resized_all, delimiter=",")
+        print "\nFINISHED: Haar Like Features for Training data\n"
+        with open('HLFeatures_Tr.pkl','wb') as outfile:
+            pickle.dump(resized_all, outfile, pickle.HIGHEST_PROTOCOL)
+#        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/HLFeatures_Tr.csv", 
+#                   resized_all, delimiter=",")
     else:
-        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/HLFeatures_Ts.csv", 
-                   resized_all, delimiter=",")
+        print "\nFINISHED: Haar Like Features for Testing data\n"
+        
+        with open('HLFeatures_Ts.pkl','wb') as outfile:
+            pickle.dump(resized_all, outfile, pickle.HIGHEST_PROTOCOL)
+#        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/HLFeatures_Ts.csv", 
+#                   resized_all, delimiter=",")
     
 
 def computeStructureFeatures(Xdata, isTraining):
+    print("\nComputing: All Structure Features")
+    print("is Training? %r" %isTraining)
+    start = time.time()
     # Separate color channel
     RChannel = Xdata[:,:,0]
     GChannel = Xdata[:,:,1]
     BChannel = Xdata[:,:,2]
     # Calculate Laplacian of Gaussian (sigma = 1.6)
+    print("Computing: Laplacian of Gaussian")
     gaussianLF_R = gaussian_laplace(RChannel, 1.6)
     gaussianLF_G = gaussian_laplace(GChannel, 1.6)
     gaussianLF_B = gaussian_laplace(BChannel, 1.6)
     gaussianLF = np.dstack((gaussianLF_R, gaussianLF_G, gaussianLF_B))
     gaussianLF = np.resize(gaussianLF, 
                              (gaussianLF.shape[0]*gaussianLF.shape[1], gaussianLF.shape[2]))
+    end = time.time()
     if (isTraining):
-        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/gaussianLapFeatures_Tr.csv", 
-                   gaussianLF, delimiter=",")
+        print "Computed: gaussianLapFeatures_Tr in %f seconds" % (end-start)
+        
+#        with open('gaussianLapFeatures_Tr.pkl','wb') as outfile:
+#            pickle.dump(gaussianLF, outfile, pickle.HIGHEST_PROTOCOL)
+#        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/gaussianLapFeatures_Tr.csv", 
+#                   gaussianLF, delimiter=",")
     else:
-        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/gaussianLapFeatures_Ts.csv", 
-                   gaussianLF, delimiter=",")
+        print "Computed: gaussianLapFeatures_Ts in %f seconds" % (end-start)
+#        with open('gaussianLapFeatures_Ts.pkl','wb') as outfile:
+#            pickle.dump(gaussianLF, outfile, pickle.HIGHEST_PROTOCOL)
+#        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/gaussianLapFeatures_Ts.csv", 
+#                   gaussianLF, delimiter=",")
         
     # Calculate eigenvalues of structure tensor  (sigma =1.6, 3.5)
+    print("Computing: eigenvalues of structure tensor")
+    start = time.time()
+    
     Axx_R1, Axy_R1, Ayy_R1 = structure_tensor(RChannel, sigma = 1.6)
     larger_R1, smaller_R1 = structure_tensor_eigvals(Axx_R1, Axy_R1, Ayy_R1)
     Axx_R2, Axy_R2, Ayy_R2 = structure_tensor(RChannel, sigma = 3.5)
@@ -352,15 +421,24 @@ def computeStructureFeatures(Xdata, isTraining):
                               larger_B1, smaller_B1, larger_B2, smaller_B2))
     eigenST = np.resize(eigenST, 
                              (eigenST.shape[0]*eigenST.shape[1], eigenST.shape[2]))
-    
+    end = time.time()
     if (isTraining):
-        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/eigenStructFeatures_Tr.csv", 
-                   eigenST, delimiter=",")
+        print "Computed: eigenStructFeatures_Tr in %f seconds" % (end-start)
+        
+#        with open('eigenStructFeatures_Tr.pkl','wb') as outfile:
+#            pickle.dump(eigenST, outfile, pickle.HIGHEST_PROTOCOL)
+#        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/eigenStructFeatures_Tr.csv", 
+#                   eigenST, delimiter=",")
     else:
-        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/eigenStructFeatures_Ts.csv", 
-                   eigenST, delimiter=",")
+        print "Computed: eigenStructFeatures_Ts in %f seconds" % (end-start)        
+#        with open('eigenStructFeatures_Ts.pkl','wb') as outfile:
+#            pickle.dump(eigenST, outfile, pickle.HIGHEST_PROTOCOL)
+#        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/eigenStructFeatures_Ts.csv", 
+#                   eigenST, delimiter=",")
         
     # Calculate eigenvalues of Hessian matrix
+    print("Computing: eigenvalues of Hessian matrix")
+    start = time.time()
     Hrr_R1, Hrc_R1, Hcc_R1 = hessian_matrix(RChannel, sigma = 1.6, order='rc')
     larger_R1, smaller_R1 = hessian_matrix_eigvals(Hrr_R1, Hrc_R1, Hcc_R1)
     Hrr_R2, Hrc_R2, Hcc_R2 = hessian_matrix(RChannel, sigma = 3.5, order='rc')
@@ -378,15 +456,23 @@ def computeStructureFeatures(Xdata, isTraining):
                                 larger_B1, smaller_B1, larger_B2, smaller_B2))
     eigenHess = np.resize(eigenHess, 
                              (eigenHess.shape[0]*eigenHess.shape[1], eigenHess.shape[2]))
-    
+    end = time.time()
     if (isTraining):
-        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/eigenHessFeatures_Tr.csv", 
-                   eigenHess, delimiter=",")
+        print "Computed: eigenHessFeatures_Tr in %f seconds" % (end-start)
+#        with open('eigenHessFeatures_Tr.pkl','wb') as outfile:
+#            pickle.dump(eigenHess, outfile, pickle.HIGHEST_PROTOCOL)
+#        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/eigenHessFeatures_Tr.csv", 
+#                   eigenHess, delimiter=",")
     else:
-        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/eigenHessFeatures_Ts.csv", 
-                   eigenHess, delimiter=",")
+        print "Computed: eigenHessFeatures_Ts in %f seconds" % (end-start)
+#        with open('eigenHessFeatures_Ts.pkl','wb') as outfile:
+#            pickle.dump(eigenHess, outfile, pickle.HIGHEST_PROTOCOL)
+#        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/eigenHessFeatures_Ts.csv", 
+#                   eigenHess, delimiter=",")
     
     # Calculate Gaussian gradient magnitude (sigma = 1.6)
+    print("Computing: Gaussian gradient magnitude")
+    start = time.time()
     gaussian_grad_R = gaussian_gradient_magnitude(RChannel, sigma = 1.6)
     gaussian_grad_G = gaussian_gradient_magnitude(GChannel, sigma = 1.6)
     gaussian_grad_B = gaussian_gradient_magnitude(BChannel, sigma = 1.6)
@@ -395,37 +481,33 @@ def computeStructureFeatures(Xdata, isTraining):
     gaussian_grad = np.resize(gaussian_grad, 
                              (gaussian_grad.shape[0]*gaussian_grad.shape[1], 
                               gaussian_grad.shape[2]))
-    
+    end = time.time()
     if (isTraining):
-        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/gaussianGradFeatures_Tr.csv", 
-                   gaussian_grad, delimiter=",")
+        print "Computed: gaussianGradFeatures_Tr in %f seconds" % (end-start)
+        
+#        with open('gaussianGradFeatures_Tr.pkl','wb') as outfile:
+#            pickle.dump(gaussian_grad, outfile, pickle.HIGHEST_PROTOCOL)
+#        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/gaussianGradFeatures_Tr.csv", 
+#                   gaussian_grad, delimiter=",")
     else:
-        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/gaussianGradFeatures_Ts.csv", 
-                   gaussian_grad, delimiter=",")
+        print "Computed: gaussianGradFeatures_Ts in %f seconds" % (end-start)
+        
+#        with open('gaussianGradFeatures_Ts.pkl','wb') as outfile:
+#            pickle.dump(gaussian_grad, outfile, pickle.HIGHEST_PROTOCOL)
+#        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/gaussianGradFeatures_Ts.csv", 
+#                   gaussian_grad, delimiter=",")
     
     All = np.concatenate((gaussianLF, eigenST, eigenHess, gaussian_grad),axis = 1)
     if (isTraining):
-        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/structFeatures_Tr.csv", 
-                   All, delimiter=",")
-    else:
-        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/structFeatures_Ts.csv", 
-                   All, delimiter=",")
-# def main():
-#     im = Image.open('/Users/wuwenjun/Downloads/sample.jpg')
-#     imdata = np.array(im.getdata(), dtype=np.float64).reshape(im.size[1], im.size[0], 3)
-#     print imdata.shape
-    #pFeature = pixelFeature(imdata, 3)
-    #adjacentF = adjacentHLFeatures(imdata, 3, 1)
-    #print pFeature.shape
-    #print adjacentF.shape
-    #nonadjF1 = nonadjacentHLFeatures1(imdata, 5, 2, 1, 1)
-    #nonadjF2 = nonadjacentHLFeatures2(imdata, 10, 8, 4, 2, 1)
+        with open('structFeatures_Tr.pkl','wb') as outfile:
+            pickle.dump(All, outfile, pickle.HIGHEST_PROTOCOL)
+#        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/structFeatures_Tr.csv", 
+#                   All, delimiter=",")
+        print "\nFINISHED: Structure Features for Training data\n"
 
-    # with file('test.txt', 'w') as outfile:  
-    #     outfile.write('# Array shape: {0}\n'.format(nonadjF2.shape))
-    #     for data_slice in nonadjF2:
-    #         np.savetxt(outfile, data_slice, fmt='%-7.2f')
-    #         outfile.write('# New slice\n')
-
-            
-# main()
+    else:   
+        with open('structFeatures_Ts.pkl','wb') as outfile:
+            pickle.dump(All, outfile, pickle.HIGHEST_PROTOCOL)
+#        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/structFeatures_Ts.csv", 
+#                   All, delimiter=",")
+        print "\nFINISHED: Structure Features for Testing data\n"

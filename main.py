@@ -9,7 +9,7 @@ from sklearn.ensemble import AdaBoostClassifier
 from sklearn.metrics import accuracy_score,f1_score,precision_recall_fscore_support
 import optimization
 
-
+import cPickle as pickle
 
 # =============================================================================
 # Load the data and split, call loadFeature(...) - Shima
@@ -101,26 +101,24 @@ feature.computeAllPixelFeatures(Xdata, True)
 feature.computeAllHaarlikeFeatures(Xdata, True)
 feature.computeAllPixelFeatures(Xdata_t, False)
 feature.computeAllHaarlikeFeatures(Xdata_t, False)
-#resized_features = np.resize(features, 
-#                             (features.shape[0]*features.shape[1], features.shape[2]))
 
 
-#features_t = feature.computeFeature(Xdata_t, [3, 15, 8, 4, 2])
-#X_test = np.resize(features_t, 
-#                             (features_t.shape[0]*features_t.shape[1], features_t.shape[2]))
-  
 
-pixelF_Tr = np.genfromtxt ('/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/pixelFeature_Tr.csv', delimiter=",")
-haarlikeF_Tr = np.genfromtxt ('/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/HLFeatures_Tr.csv', delimiter=",")
-structF_Tr = np.genfromtext('/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/structFeatures_Tr.csv', delimiter=",")
-allFeatures_Tr = np.concatenate((pixelF_Tr, haarlikeF_Tr, structF_Tr), axis = 1)
-
-pixelF_Ts = np.genfromtxt ('/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/pixelFeature_Ts.csv', delimiter=",")
-haarlikeF_Ts = np.genfromtxt ('/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/HLFeatures_Ts.csv', delimiter=",")
-structF_Ts = np.genfromtext('/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/structFeatures_Ts.csv', delimiter=",")
-X_test = np.concatenate((pixelF_Ts, haarlikeF_Ts, structF_Ts), axis = 1)
-
-
+#with open('pixelFeature_Tr.pkl','rb') as infile:
+#    pixelF_Tr = pickle.load(infile)
+#with open('HLFeatures_Tr.pkl','rb') as infile:
+#    haarlikeF_Tr = pickle.load(infile)
+#with open('structFeatures_Tr.pkl','rb') as infile:
+#    structF_Tr = pickle.load(infile)
+#allFeatures_Tr = np.concatenate((pixelF_Tr, haarlikeF_Tr, structF_Tr), axis = 1)
+#
+#with open('pixelFeature_Ts.pkl','rb') as infile:
+#    pixelF_Ts = pickle.load(infile)
+#with open('HLFeatures_Ts.pkl','rb') as infile:
+#    haarlikeF_Ts = pickle.load(infile)
+#with open('structFeatures_Ts.pkl','rb') as infile:
+#    structF_Ts = pickle.load(infile)
+#X_test = np.concatenate((pixelF_Ts, haarlikeF_Ts, structF_Ts), axis = 1)
 
 
 # ===========================Splitting & Training==============================
@@ -128,30 +126,30 @@ X_test = np.concatenate((pixelF_Ts, haarlikeF_Ts, structF_Ts), axis = 1)
 # set seed for shuffle
 # PCA reduction and Trining
 # =============================================================================
-SEED = 928
-[X_train, Y_train , X_validate, Y_validate] = dataset_split(allFeatures_Tr,resized_labels,0.9, SEED)      
-
-# reduce feature dimension
-[pca_train, Y_train, pca_validate, Y_validate, pca_test, Y_test] = feature.reduceFeatures(X_train, Y_train , X_validate, Y_validate ,X_test , Y_test)      
-
-# Try built-in decision tree
-bdt = AdaBoostClassifier(DecisionTreeClassifier(max_depth=1),
-                         algorithm="SAMME.R",
-                         n_estimators=30)
-
-bdt.fit(pca_train, Y_train.ravel())
-bdt_train = bdt.predict(pca_train)
-bdt_val = bdt.predict(pca_validate) 
-bdt_test = bdt.predict(pca_test)
-error_train = 1 - accuracy_score(Y_train, bdt_train)
-error_val = 1 - accuracy_score(Y_validate, bdt_val)
-error_test = 1 - accuracy_score(Y_test, bdt_test) 
-
-### Calculate the metrics
-test_metrics = precision_recall_fscore_support(Gr, Xr)
-print 'Precision = ' , "%.4f" %test_metrics[0][0]
-print 'Recall = ' , "%.4f" %test_metrics[1][0]
-print 'F1 score = ' , "%.4f" %test_metrics[2][0]
+#SEED = 928
+#[X_train, Y_train , X_validate, Y_validate] = dataset_split(allFeatures_Tr,resized_labels,0.9, SEED)      
+#
+## reduce feature dimension
+#[pca_train, Y_train, pca_validate, Y_validate, pca_test, Y_test] = feature.reduceFeatures(X_train, Y_train , X_validate, Y_validate ,X_test , Y_test)      
+#
+## Try built-in decision tree
+#bdt = AdaBoostClassifier(DecisionTreeClassifier(max_depth=1),
+#                         algorithm="SAMME.R",
+#                         n_estimators=30)
+#
+#bdt.fit(pca_train, Y_train.ravel())
+#bdt_train = bdt.predict(pca_train)
+#bdt_val = bdt.predict(pca_validate) 
+#bdt_test = bdt.predict(pca_test)
+#error_train = 1 - accuracy_score(Y_train, bdt_train)
+#error_val = 1 - accuracy_score(Y_validate, bdt_val)
+#error_test = 1 - accuracy_score(Y_test, bdt_test) 
+#
+#### Calculate the metrics
+#test_metrics = precision_recall_fscore_support(Gr, Xr)
+#print 'Precision = ' , "%.4f" %test_metrics[0][0]
+#print 'Recall = ' , "%.4f" %test_metrics[1][0]
+#print 'F1 score = ' , "%.4f" %test_metrics[2][0]
 
 
 #
@@ -183,3 +181,19 @@ print 'F1 score = ' , "%.4f" %test_metrics[2][0]
 #plt.xlabel('iteration')
 #plt.ylabel('Error')
 #plt.show()
+
+
+
+# =============================================================================
+# Previous data loading with csv files
+# pixelF_Tr = np.genfromtxt ('/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/pixelFeature_Tr.csv', delimiter=",")
+# haarlikeF_Tr = np.genfromtxt ('/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/HLFeatures_Tr.csv', delimiter=",")
+# structF_Tr = np.genfromtext('/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/structFeatures_Tr.csv', delimiter=",")
+# allFeatures_Tr = np.concatenate((pixelF_Tr, haarlikeF_Tr, structF_Tr), axis = 1)
+# 
+# pixelF_Ts = np.genfromtxt ('/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/pixelFeature_Ts.csv', delimiter=",")
+# haarlikeF_Ts = np.genfromtxt ('/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/HLFeatures_Ts.csv', delimiter=",")
+# structF_Ts = np.genfromtext('/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/structFeatures_Ts.csv', delimiter=",")
+# X_test = np.concatenate((pixelF_Ts, haarlikeF_Ts, structF_Ts), axis = 1)
+# 
+# =============================================================================
