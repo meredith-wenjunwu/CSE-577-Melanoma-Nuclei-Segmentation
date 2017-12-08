@@ -68,6 +68,9 @@ def visualize(testresult, Xdata_t):
 #X = Image.open("/Users/shimanofallah/Dropbox/Small images-1/train_500.tif")
 #Y = Image.open("/Users/shimanofallah/Dropbox/Small images-1/train_500_mask.tif")
 
+#X = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/train_100.tif")
+#Y = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/train_100_mask.tif")
+    
 X = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/train_100.tif")
 Y = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/train_100_mask.tif")
 Xdata = np.array(X)
@@ -92,8 +95,6 @@ Y_test = np.resize(Ydata_t, (Ydata_t.shape[0]*Ydata_t.shape[1],1))
 # =============================================================================
 # Feature Computation
 # =============================================================================
-#features = feature.computeFeature(Xdata, [3, 15, 8, 4, 2])
-
 feature.computeStructureFeatures(Xdata, True)
 feature.computeStructureFeatures(Xdata_t, False)
 
@@ -103,21 +104,17 @@ feature.computeAllPixelFeatures(Xdata_t, False)
 feature.computeAllHaarlikeFeatures(Xdata_t, False)
 
 
-
-#with open('pixelFeature_Tr.pkl','rb') as infile:
-#    pixelF_Tr = pickle.load(infile)
-#with open('HLFeatures_Tr.pkl','rb') as infile:
-#    haarlikeF_Tr = pickle.load(infile)
-#with open('structFeatures_Tr.pkl','rb') as infile:
-#    structF_Tr = pickle.load(infile)
+# ============================ load features===================================
+# load features
+# =============================================================================
+#pixelF_Tr = np.load('FR/pixelFeature_Tr.npz')['data']
+#haarlikeF_Tr = np.load('FR/HLFeatures_Tr.npz')['data']
+#structF_Tr = np.load('FR/structFeatures_Tr.npz')['data']
 #allFeatures_Tr = np.concatenate((pixelF_Tr, haarlikeF_Tr, structF_Tr), axis = 1)
 #
-#with open('pixelFeature_Ts.pkl','rb') as infile:
-#    pixelF_Ts = pickle.load(infile)
-#with open('HLFeatures_Ts.pkl','rb') as infile:
-#    haarlikeF_Ts = pickle.load(infile)
-#with open('structFeatures_Ts.pkl','rb') as infile:
-#    structF_Ts = pickle.load(infile)
+#pixelF_Ts = np.load('FR/pixelFeature_Ts.npz')['data']
+#haarlikeF_Ts = np.load('FR/HLFeatures_Ts.npz')['data']
+#structF_Ts = np.load('FR/structFeatures_Ts.npz')['data']
 #X_test = np.concatenate((pixelF_Ts, haarlikeF_Ts, structF_Ts), axis = 1)
 
 

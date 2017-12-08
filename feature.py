@@ -226,16 +226,14 @@ def computeAllPixelFeatures(Xdata, isTraining):
     end = time.time()
     if (isTraining):
         print "\nComputed: pixelFeature_Tr in %f seconds\n" % (end-start)
+        np.savez_compressed('FR/pixelFeature_Tr', data = resized_pixelF)
 
-        with open('featureArray/pixelFeature_Tr.pkl','wb') as outfile:
-            pickle.dump(resized_pixelF, outfile, pickle.HIGHEST_PROTOCOL)
         #np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/pixelFeature_Tr.csv", 
                    #resized_pixelF, delimiter=",")
     else: 
         print "\nComputed: pixelFeature_Ts in %f seconds\n" % (end-start)
+        np.savez_compressed('FR/pixelFeature_Ts', data = resized_pixelF)
         
-        with open('featureArray/pixelFeature_Ts.pkl','wb') as outfile:
-            pickle.dump(resized_pixelF, outfile, pickle.HIGHEST_PROTOCOL)
 #        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/pixelFeature_Ts.csv", 
 #                   resized_pixelF, delimiter=",")
 
@@ -356,15 +354,14 @@ def computeAllHaarlikeFeatures(Xdata, isTraining):
     
     if (isTraining):
         print "\nFINISHED: Haar Like Features for Training data\n"
-        with open('featureArray/HLFeatures_Tr.pkl','wb') as outfile:
-            pickle.dump(resized_all, outfile, pickle.HIGHEST_PROTOCOL)
+        np.savez_compressed('FR/HLFeatures_Tr', data = resized_all)
+        
 #        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/HLFeatures_Tr.csv", 
 #                   resized_all, delimiter=",")
     else:
         print "\nFINISHED: Haar Like Features for Testing data\n"
+        np.savez_compressed('FR/HLFeatures_Ts', data = resized_all)
         
-        with open('featureArray/HLFeatures_Ts.pkl','wb') as outfile:
-            pickle.dump(resized_all, outfile, pickle.HIGHEST_PROTOCOL)
 #        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/HLFeatures_Ts.csv", 
 #                   resized_all, delimiter=",")
     
@@ -499,15 +496,13 @@ def computeStructureFeatures(Xdata, isTraining):
     
     All = np.concatenate((gaussianLF, eigenST, eigenHess, gaussian_grad),axis = 1)
     if (isTraining):
-        with open('featureArray/structFeatures_Tr.pkl','wb') as outfile:
-            pickle.dump(All, outfile, pickle.HIGHEST_PROTOCOL)
+        np.savez_compressed('FR/structFeatures_Tr', data = All)
 #        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/structFeatures_Tr.csv", 
 #                   All, delimiter=",")
         print "\nFINISHED: Structure Features for Training data\n"
 
     else:   
-        with open('featureArray/structFeatures_Ts.pkl','wb') as outfile:
-            pickle.dump(All, outfile, pickle.HIGHEST_PROTOCOL)
+        np.savez_compressed('FR/structFeatures_Ts', data = All)
 #        np.savetxt("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/structFeatures_Ts.csv", 
 #                   All, delimiter=",")
         print "\nFINISHED: Structure Features for Testing data\n"
