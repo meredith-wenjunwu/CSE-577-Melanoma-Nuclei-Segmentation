@@ -2,3 +2,17 @@
 .DS_Store
 
 *.pyc
+
+*.tif
+
+*.jpeg
+
+*.png
+
+*.jpeg
+
+*.jpeg
+
+output_overlayNoPCA.jpeg
+
+*.jpeg
