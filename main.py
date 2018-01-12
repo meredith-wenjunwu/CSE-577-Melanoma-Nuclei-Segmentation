@@ -8,8 +8,8 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.metrics import accuracy_score,f1_score,precision_recall_fscore_support
 import optimization
+import os
 
-import cPickle as pickle
 
 # =============================================================================
 # Load the data and split, call loadFeature(...) - Shima
@@ -59,50 +59,72 @@ def visualize(testresult, Xdata_t):
     im2.save("/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/output_overlay.jpeg")
     return (im, im2)
 
+# =============================================================================
+# Splitted Image Feature Computation (Loop)
+# folder path should be the folder that contains the splitted iages
+# =============================================================================
+def computeFeatureInDirectory(inputDirectory = "croppedImages/", outputDirectory = 'FR/'):
     
+    if not os.path.exists(outputDirectory):
+            os.makedirs(outputDirectory)
+    for filename in os.listdir(inputDirectory):
+        if filename.endswith(".tif") or filename.endswith(".png"): 
+            name, file_extension = os.path.splitext(filename)
+            path = os.path.join(inputDirectory, filename)
+            print(path)
+            X = Image.open(path)
+            image = np.array(X)
+            outpath = os.path.join(outputDirectory, name)
+            if not os.path.exists(outpath):
+                os.makedirs(outpath)
+            
+            if "train" in filename:
+                feature.computeAllPixelFeatures(image, True, outpath)
+                feature.computeStructureFeatures(image, True, outpath)
+                feature.computeAllHaarlikeFeatures(image, True, outpath)
+            else:
+                feature.computeAllPixelFeatures(image, False, outpath)
+                feature.computeStructureFeatures(image, False, outpath)
+                feature.computeAllHaarlikeFeatures(image, False, outpath)
+
+
 
 # =============================================================================
 # Data Loading
 # =============================================================================
-################## Training Data
-#X = Image.open("/Users/shimanofallah/Dropbox/Small images-1/train_500.tif")
-#Y = Image.open("/Users/shimanofallah/Dropbox/Small images-1/train_500_mask.tif")
-
-#X = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/train_100.tif")
-#Y = Image.open("/Users/wuwenjun/Documents/UW/CSE 577/image/train_100_mask.tif")
-    
-X = Image.open("image_merged.tif")
-Y = Image.open("mask_merged.tif")
-Xdata = np.array(X)
-
-Ydata = np.array(Y).astype(int)
-Ydata[Ydata != 0] = 1
-Ydata[Ydata == 0] = -1
-resized_labels = np.resize(Ydata, (Ydata.shape[0]*Ydata.shape[1],1))
-################## Testing Data
-X_t = Image.open("test.tif")
-Y_t = Image.open("test_mask.tif")
-
-
-
-Xdata_t = np.array(X_t)
-Ydata_t = np.array(Y_t).astype(int)
-Ydata_t[Ydata_t != 0] = 1
-Ydata_t[Ydata_t == 0] = -1
-Y_test = np.resize(Ydata_t, (Ydata_t.shape[0]*Ydata_t.shape[1],1))
+################### Training Data
+#X = Image.open("image_merged.tif")
+#Y = Image.open("mask_merged.tif")
+#Xdata = np.array(X)
+#
+#Ydata = np.array(Y).astype(int)
+#Ydata[Ydata != 0] = 1
+#Ydata[Ydata == 0] = -1
+#resized_labels = np.resize(Ydata, (Ydata.shape[0]*Ydata.shape[1],1))
+################### Testing Data
+#X_t = Image.open("test.tif")
+#Y_t = Image.open("test_mask.tif")
+#
+#
+#
+#Xdata_t = np.array(X_t)
+#Ydata_t = np.array(Y_t).astype(int)
+#Ydata_t[Ydata_t != 0] = 1
+#Ydata_t[Ydata_t == 0] = -1
+#Y_test = np.resize(Ydata_t, (Ydata_t.shape[0]*Ydata_t.shape[1],1))
 
 
 # =============================================================================
-# Feature Computation
+# General Feature Computation
 # =============================================================================
-feature.computeStructureFeatures(Xdata, True)
-feature.computeStructureFeatures(Xdata_t, False)
-
-feature.computeAllPixelFeatures(Xdata, True)
-feature.computeAllHaarlikeFeatures(Xdata, True)
-feature.computeAllPixelFeatures(Xdata_t, False)
-feature.computeAllHaarlikeFeatures(Xdata_t, False)
-
+#feature.computeStructureFeatures(Xdata, True)
+#feature.computeStructureFeatures(Xdata_t, False)
+#
+#feature.computeAllPixelFeatures(Xdata, True)
+#feature.computeAllHaarlikeFeatures(Xdata, True)
+#feature.computeAllPixelFeatures(Xdata_t, False)
+#feature.computeAllHaarlikeFeatures(Xdata_t, False)
+computeFeatureInDirectory("Images/")
 
 # ============================ load features===================================
 # load features
@@ -194,3 +216,4 @@ feature.computeAllHaarlikeFeatures(Xdata_t, False)
 # X_test = np.concatenate((pixelF_Ts, haarlikeF_Ts, structF_Ts), axis = 1)
 # 
 # =============================================================================
+

@@ -13,7 +13,6 @@ from scipy import ndimage
 from skimage.morphology import watershed
 from skimage.feature import peak_local_max
 from skimage import measure
-from skimage import filters
 from os import path
 from os import makedirs
 
@@ -46,7 +45,7 @@ def cellBodyfind(original, binary, directory = 'Output/',
             plt.scatter(center[1], center[0], marker="+", color='r', s = 12)
     plt.axis('off')
     savepath = path.join(directory,'centroidLabeled.png')
-    plt.savefig(savepath, bbox_inches='tight')
+    plt.savefig(savepath, bbox_inches='tight', dpi=80 * 10)
     plt.show()
     
     
@@ -54,9 +53,10 @@ def cellBodyfind(original, binary, directory = 'Output/',
 def findConnected(binary, savepath = 'Output/out.png'):
     print "Finding Connected Components in the image:"
     blur_radius = 3
-    threshold = 200
+    threshold = 100
     
     imgf = ndimage.gaussian_filter(binary, blur_radius)
+    scipy.misc.imsave('Output/gaussian.png', imgf)
     
     labeled, nr_objects = ndimage.label(imgf > threshold)
     print "Number of connected objects is %d " %nr_objects
@@ -114,10 +114,13 @@ def separateConnected(original,labeled, prop, nr_objects, area_threshold_low):
 #    plt.imshow(labels)
 #    plt.show()
     
-    
+# =============================================================================
+# Test Code
+# Use a mask from training data    
+# =============================================================================
 
-fname1 = 'test.tif'
-fname2 = 'original.tif'   
+fname1 = 'Result/Mask_IntensityNoMorph.tif'
+fname2 = 'Result/test_500.tif'   
 mask = scipy.misc.imread(fname1)
 original = scipy.misc.imread(fname2)
 print(original.shape)
