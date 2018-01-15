@@ -50,12 +50,35 @@ def pixelFeature(input_image, w):
 
 def sliding_window(image, windowSize):
     # slide a window across the image
+    s = image.shape
+    row = s[0]
+    col = s[1]
+    
+    wX = windowSize[0]
+    wY = windowSize[1]
+    
+    temp = image[0:wY/2, :]
+    temp = np.flip(temp,axis=0)
+    paddedImage = np.append(temp, image, axis=0)
+    temp = image[row-wY/2:row, :]
+    temp = np.flip(temp,axis=0)
+    paddedImage = np.append(paddedImage, temp, axis=0)
+    temp = paddedImage[:,0:wX/2]
+    temp = np.flip(temp,axis=1)
+    paddedImage = np.append(temp, paddedImage, axis=1)
+    temp = paddedImage[:, col-wX/2:col]
+    temp = np.flip(temp,axis=1)
+    paddedImage = np.append(paddedImage, temp, axis=1)
+    
     if not image.size:
         print("Input Image is empty!")
         return
     for y in xrange(0, image.shape[0], 1):
         for x in xrange(0, image.shape[1], 1):
-            yield (x, y, image[y:y + windowSize[1], x:x + windowSize[0]])
+            window = paddedImage[y:y + windowSize[1], x:x + windowSize[0]]
+            yield (x, y, paddedImage[y:y + windowSize[1], x:x + windowSize[0]])
+                
+                
 
 
 def adjacentHLFeatures(input_image, window1, window2):
@@ -68,7 +91,10 @@ def adjacentHLFeatures(input_image, window1, window2):
     w1 = window1
     w2 = window2
     w12 = w1 + 2 * window2
+    windows = sliding_window(input_image, (w12, w12))
+    count = 0
     for (x2, y2, window2) in sliding_window(input_image, (w12, w12)):
+        count = count + 1
         if window2.shape[0] == w12 and window2.shape[1] == w12:
             window1 = window2[w2:w2+w1, w2:w2+w1]
             features[y2, x2, 0:input_image.shape[2]] = sum(sum(window2)) - sum(sum(window1))
@@ -95,9 +121,11 @@ def nonadjacentHLFeatures1(input_image, window1, window2, window3, norm = 1):
     w12 = w1 + 2 * w2
     w123 = w1 + 2 * (w2 + w3)
     for (x123, y123, window123) in sliding_window(input_image, (w123, w123)):
-        window12 = input_image[y123+w3:y123+w3 + w12, x123+w3:x123+w3 + w12]
-        window1 = input_image[y123+w3+w2:y123+w3+w2+w1, x123+w3+w2:x123+w3+w2+w1]
+        window12 = window123[w3:w3+w12, w3:w3+w12]
+        window1 = window123[w3+w2:w3+w2+w1, w3+w2:w3+w2+w1]
         # HLNA(w1, w2, w3)
+        if (y123==98 and x123==0):
+            print("")
         features[y123, x123, 0:input_image.shape[2]] = sum(sum(window123))
         - sum(sum(window12)) - norm * sum(sum(window1))
     return features
@@ -122,9 +150,9 @@ def nonadjacentHLFeatures2(input_image, window1, window2, window3, window4, norm
     w123 = w1 + 2 * (w2 + w3)
     w1234 = w123 + 2 * w4
     for (x1234, y1234, window1234) in sliding_window(input_image, (w1234, w1234)):
-        window123 = input_image[y1234+w4:y1234+w4+w123, x1234+w4:x1234+w4+w123]
-        window12 = input_image[y1234+w3+w4:y1234+w3+w4+w12, x1234+w3+w4:x1234+w3+w4+w12]
-        window1 = input_image[y1234+w2+w3+w4:y1234+w2+w3+w4+w1, x1234+w2+w3+w4:x1234+w2+w3+w4+w1]
+        window123 = window1234[w4:w4+w123, w4:w4+w123]
+        window12 = window1234[w3+w4:w3+w4+w12, w3+w4:w3+w4+w12]
+        window1 = window1234[w2+w3+w4:w2+w3+w4+w1, w2+w3+w4:w2+w3+w4+w1]
         # HLNA2(w1, w2, w3, w4)
 
         features[y1234, x1234, 0:input_image.shape[2]] = sum(sum(window1234))
@@ -218,7 +246,7 @@ def computeAllPixelFeatures(Xdata, isTraining, path):
     print("is Training? %r" %isTraining)
     start = time.time()
     
-    pixelw = [3, 9, 15, 25]
+    pixelw = [2, 8, 14, 24]
     pixelF = np.zeros((Xdata.shape[0], Xdata.shape[1], 
                        Xdata.shape[2] * 4 * len(pixelw)))
     for i in xrange(len(pixelw)):
@@ -259,7 +287,7 @@ def computeAllHaarlikeFeatures(Xdata, isTraining, path):
     print("Computing: adjacentHLFeature")
     start = time.time()
     
-    w1 = range(5,26, 5)
+    w1 = range(4,26,4)
     w2 = range(1,9,3)
     adjacentHLF = np.zeros((Xdata.shape[0], Xdata.shape[1], 
                              Xdata.shape[2] * len(w1) * len(w2)))
@@ -287,7 +315,7 @@ def computeAllHaarlikeFeatures(Xdata, isTraining, path):
 #                   resized_adjacentHLF, delimiter=",")
 
     # Compute all nonadjacent Haar-like feature 1
-    w1 = range(5, 26, 5)
+    w1 = range(4,26,4)
     w2 = range(1, 9, 3)
     w3 = range(1, 9, 2)
     print("Computing: Nonadjacent Haar-like feature 1")
@@ -320,7 +348,7 @@ def computeAllHaarlikeFeatures(Xdata, isTraining, path):
 #                   resized_nonadjacentHLF1, delimiter=",")
     
 #     Compute all nonadjacent Haar-like feature 2
-    w1 = range(5, 26, 5)
+    w1 = range(4,26,4)
     w2 = range(1, 9, 3)
     w3 = range(1, 9, 3)
     w4 = range(1, 9, 3)

@@ -79,12 +79,12 @@ def computeFeatureInDirectory(inputDirectory = "croppedImages/", outputDirectory
                 os.makedirs(outpath)
             
             if "train" in filename:
-                feature.computeAllPixelFeatures(image, True, outpath)
-                feature.computeStructureFeatures(image, True, outpath)
+#                feature.computeAllPixelFeatures(image, True, outpath)
+#                feature.computeStructureFeatures(image, True, outpath)
                 feature.computeAllHaarlikeFeatures(image, True, outpath)
             else:
-                feature.computeAllPixelFeatures(image, False, outpath)
-                feature.computeStructureFeatures(image, False, outpath)
+#                feature.computeAllPixelFeatures(image, False, outpath)
+#                feature.computeStructureFeatures(image, False, outpath)
                 feature.computeAllHaarlikeFeatures(image, False, outpath)
 
 
@@ -124,7 +124,7 @@ def computeFeatureInDirectory(inputDirectory = "croppedImages/", outputDirectory
 #feature.computeAllHaarlikeFeatures(Xdata, True)
 #feature.computeAllPixelFeatures(Xdata_t, False)
 #feature.computeAllHaarlikeFeatures(Xdata_t, False)
-computeFeatureInDirectory("Images/")
+computeFeatureInDirectory()
 
 # ============================ load features===================================
 # load features
