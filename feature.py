@@ -91,15 +91,14 @@ def adjacentHLFeatures(input_image, window1, window2):
     w1 = window1
     w2 = window2
     w12 = w1 + 2 * window2
-    windows = sliding_window(input_image, (w12, w12))
-    count = 0
     for (x2, y2, window2) in sliding_window(input_image, (w12, w12)):
-        count = count + 1
+#        if x2 == 1197 and y2 == 257:
+#            print("hello")
         if window2.shape[0] == w12 and window2.shape[1] == w12:
             window1 = window2[w2:w2+w1, w2:w2+w1]
             features[y2, x2, 0:input_image.shape[2]] = sum(sum(window2)) - sum(sum(window1))
         else:
-            print("hello")
+            print(x2,y2)
     return features
 
 
@@ -121,13 +120,14 @@ def nonadjacentHLFeatures1(input_image, window1, window2, window3, norm = 1):
     w12 = w1 + 2 * w2
     w123 = w1 + 2 * (w2 + w3)
     for (x123, y123, window123) in sliding_window(input_image, (w123, w123)):
-        window12 = window123[w3:w3+w12, w3:w3+w12]
-        window1 = window123[w3+w2:w3+w2+w1, w3+w2:w3+w2+w1]
-        # HLNA(w1, w2, w3)
-        if (y123==98 and x123==0):
-            print("")
-        features[y123, x123, 0:input_image.shape[2]] = sum(sum(window123))
-        - sum(sum(window12)) - norm * sum(sum(window1))
+        if window123.shape[0] == w123 and window123.shape[1] == w123:
+            window12 = window123[w3:w3+w12, w3:w3+w12]
+            window1 = window123[w3+w2:w3+w2+w1, w3+w2:w3+w2+w1]
+            # HLNA(w1, w2, w3)
+            features[y123, x123, 0:input_image.shape[2]] = sum(sum(window123))
+            - sum(sum(window12)) - norm * sum(sum(window1))
+        else:
+            print("non2: ", (x123, y123))
     return features
 
 
@@ -219,7 +219,10 @@ def reduceFeatures(feature_train, Y_train, feature_validate, Y_validate,
     pca_test = pca.transform(feature_test)
     return pca_train, Y_train, pca_validate, Y_validate, pca_test, Y_test
 
-
+def reduceFeatureSimple(features):
+    (pca, numComponents) = doPCA(features, 0.99)
+    pca_train = pca.transform(features)
+    return pca_train
 
 # =============================================================================
 # Perform PCA dimensionality reduction:
