@@ -9,6 +9,7 @@ from sklearn.ensemble import AdaBoostClassifier
 from sklearn.metrics import accuracy_score,f1_score,precision_recall_fscore_support
 import optimization
 import os
+import pickle
 
 
 # =============================================================================
@@ -79,28 +80,59 @@ def computeFeatureInDirectory(inputDirectory = "croppedImages/", outputDirectory
                 os.makedirs(outpath)
             
             if "train" in filename:
-#                feature.computeAllPixelFeatures(image, True, outpath)
-#                feature.computeStructureFeatures(image, True, outpath)
-                feature.computeAllHaarlikeFeatures(image, True, outpath)
+                feature.computeAllPixelFeatures(image, True, outpath)
+                feature.computeStructureFeatures(image, True, outpath)
+                # feature.computeAllHaarlikeFeatures(image, True, outpath)
             else:
-#                feature.computeAllPixelFeatures(image, False, outpath)
-#                feature.computeStructureFeatures(image, False, outpath)
-                feature.computeAllHaarlikeFeatures(image, False, outpath)
+                feature.computeAllPixelFeatures(image, False, outpath)
+                feature.computeStructureFeatures(image, False, outpath)
+                # feature.computeAllHaarlikeFeatures(image, False, outpath)
 
 
+def trainAdaboostwithDirectory(PCA = False, inputDirectory = 'FR/', outputDirectory = 'classifier/'):
+    if not os.path.exists(outputDirectory):
+            os.makedirs(outputDirectory)
+    bdt = AdaBoostClassifier(DecisionTreeClassifier(max_depth=1), 
+                             algorithm="SAMME.R",
+                             n_estimators=50)
+    params = None
+    for dir in os.listdir(inputDirectory):
+        if os.path.isdir(os.path.join(inputDirectory, dir)) and ("train" in dir):
+            X = np.zeros([1,2])
+            if params:
+                bdt.set_params(params)
+            for filename in os.listdir(os.path.join(inputDirectory, dir)):
+                path = os.path.join(inputDirectory, dir, filename)
+                name, file_extension = os.path.splitext(filename)
+                print(path)
+                if filename.endswith('.npz'): 
+                    if (np.array_equiv(X, [0, 0])):
+                        X = np.load(path)['data']
+                    else:
+                        X = np.concatenate((X,np.load(path)['data']), axis=1)
+                elif "mask" in filename and filename.endswith('.tif'):
+                    Y = Image.open(path)
+                    Y = np.array(Y).astype(int)
+                    Y[Y != 0] = 1
+                    Y[Y == 0] = -1
+                    Y = np.resize(Y, (Y.shape[0]*Y.shape[1],1))
+            # Train classifier with X and Y
+            bdt.fit(X, Y.ravel())
+            params = bdt.get_params()
 
+trainAdaboostwithDirectory()
 # =============================================================================
 # Data Loading
 # =============================================================================
 ################### Training Data
-#X = Image.open("image_merged.tif")
-#Y = Image.open("mask_merged.tif")
+# X = Image.open("image_merged.tif")
+# Y = Image.open("mask_merged.tif")
 #Xdata = np.array(X)
 #
-#Ydata = np.array(Y).astype(int)
-#Ydata[Ydata != 0] = 1
-#Ydata[Ydata == 0] = -1
-#resized_labels = np.resize(Ydata, (Ydata.shape[0]*Ydata.shape[1],1))
+# Ydata = np.array(Y).astype(int)
+# Ydata[Ydata != 0] = 1
+# Ydata[Ydata == 0] = -1
+# resized_labels = np.resize(Ydata, (Ydata.shape[0]*Ydata.shape[1],1))
 ################### Testing Data
 #X_t = Image.open("test.tif")
 #Y_t = Image.open("test_mask.tif")
@@ -124,15 +156,18 @@ def computeFeatureInDirectory(inputDirectory = "croppedImages/", outputDirectory
 #feature.computeAllHaarlikeFeatures(Xdata, True)
 #feature.computeAllPixelFeatures(Xdata_t, False)
 #feature.computeAllHaarlikeFeatures(Xdata_t, False)
-computeFeatureInDirectory()
+# computeFeatureInDirectory()
 
 # ============================ load features===================================
 # load features
 # =============================================================================
-#pixelF_Tr = np.load('FR/pixelFeature_Tr.npz')['data']
+# pixelF_Tr = np.load('FR/pixelFeature_Tr.npz')['data']
 #haarlikeF_Tr = np.load('FR/HLFeatures_Tr.npz')['data']
-#structF_Tr = np.load('FR/structFeatures_Tr.npz')['data']
-#allFeatures_Tr = np.concatenate((pixelF_Tr, haarlikeF_Tr, structF_Tr), axis = 1)
+# structF_Tr = np.load('FR/structFeatures_Tr.npz')['data']
+# allFeatures_Tr = np.concatenate((pixelF_Tr, structF_Tr), axis = 1)
+# allFeatures_Tr = np.concatenate((pixelF_Tr, haarlikeF_Tr, structF_Tr), axis = 1)
+# X_train = allFeatures_Tr
+# Y_train = resized_labels
 #
 #pixelF_Ts = np.load('FR/pixelFeature_Ts.npz')['data']
 #haarlikeF_Ts = np.load('FR/HLFeatures_Ts.npz')['data']
@@ -149,71 +184,33 @@ computeFeatureInDirectory()
 #[X_train, Y_train , X_validate, Y_validate] = dataset_split(allFeatures_Tr,resized_labels,0.9, SEED)      
 #
 ## reduce feature dimension
-#[pca_train, Y_train, pca_validate, Y_validate, pca_test, Y_test] = feature.reduceFeatures(X_train, Y_train , X_validate, Y_validate ,X_test , Y_test)      
-#
-## Try built-in decision tree
-#bdt = AdaBoostClassifier(DecisionTreeClassifier(max_depth=1),
+#[pca_train, Y_train, pca_validate, Y_validate, pca_test, Y_test] = feature.reduceFeatures(X_train, Y_train , X_validate, Y_validate ,X_test , Y_test)
+# print 'PCA'
+# pca_train = feature.reduceFeatureSimple(X_train)
+
+# print 'Build Classifier'
+# Try built-in decision tree
+# bdt = AdaBoostClassifier(DecisionTreeClassifier(max_depth=1),
 #                         algorithm="SAMME.R",
-#                         n_estimators=30)
-#
-#bdt.fit(pca_train, Y_train.ravel())
-#bdt_train = bdt.predict(pca_train)
+#                         n_estimators=50)
+
+# bdt.fit(pca_train, Y_train.ravel())
+# bdt_train = bdt.predict(pca_train)
+
+# filename = 'classifier/modelwithPixelandStruct.sav'
+# pickle.dump(bdt, open(filename, 'wb'))
 #bdt_val = bdt.predict(pca_validate) 
 #bdt_test = bdt.predict(pca_test)
-#error_train = 1 - accuracy_score(Y_train, bdt_train)
+# error_train = 1 - accuracy_score(Y_train, bdt_train)
+# print 'error train: %.4f' %error_train
 #error_val = 1 - accuracy_score(Y_validate, bdt_val)
 #error_test = 1 - accuracy_score(Y_test, bdt_test) 
 #
 #### Calculate the metrics
-#test_metrics = precision_recall_fscore_support(Gr, Xr)
-#print 'Precision = ' , "%.4f" %test_metrics[0][0]
-#print 'Recall = ' , "%.4f" %test_metrics[1][0]
-#print 'F1 score = ' , "%.4f" %test_metrics[2][0]
+# test_metrics = precision_recall_fscore_support(Y_train, bdt_train)
+# print 'Precision = ' , "%.4f" %test_metrics[0][0]
+# print 'Recall = ' , "%.4f" %test_metrics[1][0]
+# print 'F1 score = ' , "%.4f" %test_metrics[2][0]
 
 
-#
-## Fit a simple decision tree first
-#base_tree = DecisionTreeClassifier(max_depth = 1, random_state = 1)
-#
-#base_tree.fit(pca_train,Y_train)
-#pred_train = base_tree.predict(pca_train)
-#pred_val = base_tree.predict(pca_validate)   
-#error_train = 1 - accuracy_score(Y_train, pred_train)
-#error_val = 1 - accuracy_score(Y_validate, pred_val)
-#
-#
-#
-#er_train = [error_train]
-#er_val = [error_val]
-#iteration=50
-#
-#for i in range(10, iteration+10, 10):
-#    [error_train, error_val] = AdaBoost(pca_train ,Y_train , pca_validate, Y_validate, i, base_tree)
-#    er_train.append(error_train)
-#    er_val.append(error_val)
-#
-#
-#D = range(0, iteration+10, 10)    
-#TR,= plt.plot(D,er_train)
-#TE,= plt.plot(D,er_val)
-#plt.legend([TR,TE], ["Training data","Testing data"])
-#plt.xlabel('iteration')
-#plt.ylabel('Error')
-#plt.show()
-
-
-
-# =============================================================================
-# Previous data loading with csv files
-# pixelF_Tr = np.genfromtxt ('/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/pixelFeature_Tr.csv', delimiter=",")
-# haarlikeF_Tr = np.genfromtxt ('/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/HLFeatures_Tr.csv', delimiter=",")
-# structF_Tr = np.genfromtext('/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/structFeatures_Tr.csv', delimiter=",")
-# allFeatures_Tr = np.concatenate((pixelF_Tr, haarlikeF_Tr, structF_Tr), axis = 1)
-# 
-# pixelF_Ts = np.genfromtxt ('/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/pixelFeature_Ts.csv', delimiter=",")
-# haarlikeF_Ts = np.genfromtxt ('/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/HLFeatures_Ts.csv', delimiter=",")
-# structF_Ts = np.genfromtext('/Users/wuwenjun/GitHub/CSE-577-Melanoma-Nuclei-Segmentation/structFeatures_Ts.csv', delimiter=",")
-# X_test = np.concatenate((pixelF_Ts, haarlikeF_Ts, structF_Ts), axis = 1)
-# 
-# =============================================================================
-
+# save the model to disk
