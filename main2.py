@@ -10,9 +10,6 @@ from sklearn.metrics import accuracy_score,f1_score,precision_recall_fscore_supp
 import optimization
 import os
 import pickle
-import online_boosting
-from online_boosting.utils.utils import get_weak_learner
-
 
 
 # =============================================================================
@@ -83,53 +80,16 @@ def computeFeatureInDirectory(inputDirectory = "croppedImages/", outputDirectory
                 os.makedirs(outpath)
             
             if "train" in filename:
-                feature.computeAllPixelFeatures(image, True, outpath)
                 feature.computeStructureFeatures(image, True, outpath)
+                feature.computeAllPixelFeatures(image, True, outpath)
                 # feature.computeAllHaarlikeFeatures(image, True, outpath)
             else:
-                feature.computeAllPixelFeatures(image, False, outpath)
                 feature.computeStructureFeatures(image, False, outpath)
+                feature.computeAllPixelFeatures(image, False, outpath)
                 # feature.computeAllHaarlikeFeatures(image, False, outpath)
 
 
-def trainAdaboostwithDirectory(PCA = False, inputDirectory = 'FR/', 
-                               outputDirectory = 'classifier/',
-                               learnerName = "DecisionTree",
-                               ensembleName = "AdaBooster"):
-    if not os.path.exists(outputDirectory):
-            os.makedirs(outputDirectory)
-    learner = online_boosting.utils.utils.get_weak_learner(learnerName)
-    ensembler = online_boosting.utils.utils.get_ensembler("AdaBooster")
-    bdt = ensembler(learner, classes=2, M=50)
-    for dir in os.listdir(inputDirectory):
-        if os.path.isdir(os.path.join(inputDirectory, dir)) and ("train" in dir):
-            X = np.zeros([1,2])
-            i = 0
-            for filename in os.listdir(os.path.join(inputDirectory, dir)):
-                path = os.path.join(inputDirectory, dir, filename)
-                name, file_extension = os.path.splitext(filename)
-                print(path)
-                if filename.endswith('.npz'): 
-                    if (np.array_equiv(X, [0, 0])):
-                        X = np.load(path)['data']
-                    else:
-                        X = np.concatenate((X,np.load(path)['data']), axis=1)
-                elif "mask" in filename and filename.endswith('.tif'):
-                    Y = Image.open(path)
-                    Y = np.array(Y).astype(int)
-                    Y[Y != 0] = 1
-                    Y[Y == 0] = -1
-                    Y = np.resize(Y, (Y.shape[0]*Y.shape[1],1))
-            # Train classifier with X and Y
-            data = zip(X, Y)
-            for (features, label) in data:
-                i+= 1
-                bdt.update(features[np.newaxis], label[np.newaxis])
-                if (i % 2000==0):
-                    print('# of samples: %d' %i)
-                
 
-trainAdaboostwithDirectory()
 # =============================================================================
 # Data Loading
 # =============================================================================
@@ -165,7 +125,7 @@ trainAdaboostwithDirectory()
 #feature.computeAllHaarlikeFeatures(Xdata, True)
 #feature.computeAllPixelFeatures(Xdata_t, False)
 #feature.computeAllHaarlikeFeatures(Xdata_t, False)
-# computeFeatureInDirectory()
+computeFeatureInDirectory(inputDirectory='croppedImages/subset')
 
 # ============================ load features===================================
 # load features
